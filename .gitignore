@@ -9,3 +9,20 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+.config
+*.o
+*.pyc
+
+sdkconfig
+sdkconfig.old
+
+# gcov coverage reports
+*.gcda
+*.gcno
+coverage.info
+coverage_report/
+
+# Clion IDE CMake build & config
+.idea/
+cmake-build-*/
