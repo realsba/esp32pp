@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(EXTRA_COMPONENT_DIRS
         $ENV{IDF_PATH}/components
+        Button
+        CriticalSection
         DHT
         LedStrip
         Task
