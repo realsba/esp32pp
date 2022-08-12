@@ -1,0 +1,10 @@
+menu "Example Configuration"
+
+    config RMT_GPIO_NUM
+        int "GPIO pin"
+        range 0 25
+        default 5
+        help
+            GPIO pin number to be used for cominication with DHT22 sensor
+
+endmenu
