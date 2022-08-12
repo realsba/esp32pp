@@ -33,8 +33,8 @@ private:
   virtual float humidity() = 0;
 
 protected:
+  std::error_code m_status;
   uint16_t m_startSignalDuration {1000};
-  uint8_t m_status {0};
   uint8_t m_data[5] {};
 
 private:
@@ -68,7 +68,7 @@ namespace error {
 
 enum class DhtCategory
 {
-  Failed = 1,
+  BadResponse = 1
 };
 
 namespace detail {

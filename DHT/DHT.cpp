@@ -41,7 +41,6 @@ void DHT::setup(gpio_num_t gpio, uint32_t clockResolution)
     .on_recv_done = rx_done_callback,
   };
 
-  ESP_LOGI(TAG, "task addr %p", m_task.getNativeHandle());
   ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(m_channel, &cbs, m_task.getNativeHandle()));
 
   gpio_set_direction(m_pin, GPIO_MODE_OUTPUT);
@@ -56,7 +55,7 @@ void DHT::read(Handler&& handler)
   };
 
   m_handler = std::move(handler);
-  m_status = 0;
+  m_status = std::error_code();
 
   gpio_set_direction(m_pin, GPIO_MODE_OUTPUT);
   gpio_set_level(m_pin, 0);
@@ -82,16 +81,13 @@ void DHT::readSensor()
     ESP_LOGI(TAG, "Decode a response %p %d", eventData->received_symbols, eventData->num_symbols);
 
     decode(eventData->received_symbols, eventData->num_symbols);
-    ESP_LOGI(TAG, "status %d", (int) m_status);
 
     rmt_disable(m_channel);
     gpio_set_direction(m_pin, GPIO_MODE_OUTPUT);
     gpio_set_level(m_pin, 1);
 
-    if (m_status == 0) {
-      if (m_handler) {
-        m_handler(std::error_code {}, humidity(), temperature());
-      }
+    if (m_handler) {
+      m_handler(m_status, humidity(), temperature());
     }
   }
 }
@@ -103,58 +99,50 @@ void DHT::decode(rmt_symbol_word_t* data, size_t numItems)
   m_data[2] = 0;
   m_data[3] = 0;
   m_data[4] = 0;
-  m_status = 0;
+  m_status = error::DhtCategory::BadResponse;
 
   if (numItems < 42) {
-    m_status = 1;
-    for (int i = 0; i < numItems; ++i) {
-      printf("%d: %d %d, %d %d\n", i, (int)data[i].level0, (int)data[i].duration0, (int)data[i].level1, (int)data[i].duration1);
-    }
+    ESP_LOGD(TAG, "Incorrect pulse count: %u", numItems);
     return;
   }
 
   auto* ptr = reinterpret_cast<rmt_symbol_word_t*>(reinterpret_cast<uint8_t*>(data) + 2);
   --numItems;
 
-  for (int i = 0; i < numItems; ++i) {
-    printf("%d: %d %d, %d %d\n", i, (int)ptr[i].level0, (int)ptr[i].duration0, (int)ptr[i].level1, (int)ptr[i].duration1);
+  auto duration = ptr[0].duration0;
+  if (duration < 75 || duration > 180) {
+    ESP_LOGD(TAG, "Bad response signal. Low time: %u", duration);
+    return;
   }
-
-  uint32_t duration = ptr[0].duration0 + ptr[0].duration1;
-  if (duration < 140 || duration > 180) {
-    ESP_LOGE(TAG, "Bad 'Response signal'");
-    m_status = 2;
+  duration = ptr[0].duration1;
+  if (duration < 75 || duration > 180) {
+    ESP_LOGD(TAG, "Bad response signal. High time: %u", duration);
     return;
   }
 
   for (int i = 1; i < numItems - 1; ++i) {
     if (ptr[i].level0 != 0 || ptr[i].level1 != 1) {
-      ESP_LOGE(TAG, "Incorrect level");
-      m_status = 3;
-      return; // error
+      ESP_LOGD(TAG, "Incorrect level. item: %d, level0: %u, level1: %u", i, ptr[i].level0, ptr[i].level1);
+      return;
     }
 
     duration = ptr[i].duration0;
     if (duration < 48 || duration > 55) {
-      ESP_LOGE(TAG, "Incorrect duration0");
-      m_status = 4;
-      return; // error
+      ESP_LOGE(TAG, "Incorrect duration0. item: %d, duration: %u", i, duration);
+      return;
     }
     m_data[(i - 1) / 8] <<= 1;
     duration = ptr[i].duration1;
     if (duration >= 68 && duration <= 75) {
       m_data[(i - 1) / 8] |= 1;
     } else if (duration < 22 || duration > 30) {
-      ESP_LOGE(TAG, "Incorrect duration1");
-      m_status = 5;
-      return; // error
+      ESP_LOGE(TAG, "Incorrect duration1. item: %d, duration: %u", i, duration);
+      return;
     }
   }
 
   if (m_data[4] == ((m_data[0] + m_data[1] + m_data[2] + m_data[3]) & 0xFF)) {
-    m_status = 0;
-  } else {
-    m_status = 6;  // checksum error
+    m_status = std::error_code();
   }
 }
 
@@ -165,7 +153,7 @@ DHT11::DHT11()
 
 float DHT11::temperature()
 {
-  if (m_status != 0) {
+  if (m_status) {
     return std::numeric_limits<float>::quiet_NaN();
   }
   return static_cast<float>(m_data[2]);
@@ -173,7 +161,7 @@ float DHT11::temperature()
 
 float DHT11::humidity()
 {
-  if (m_status != 0) {
+  if (m_status) {
     return std::numeric_limits<float>::quiet_NaN();
   }
   return static_cast<float>(m_data[0]);
@@ -181,7 +169,7 @@ float DHT11::humidity()
 
 float DHT22::temperature()
 {
-  if (m_status != 0) {
+  if (m_status) {
     return std::numeric_limits<float>::quiet_NaN();
   }
   auto temp = static_cast<float>((((m_data[2] & 0x7F) << 8) | m_data[3]) * 0.1);
@@ -193,7 +181,7 @@ float DHT22::temperature()
 
 float DHT22::humidity()
 {
-  if (m_status != 0) {
+  if (m_status) {
     return std::numeric_limits<float>::quiet_NaN();
   }
   return static_cast<float>(((m_data[0] << 8) | m_data[1]) * 0.1);
@@ -218,7 +206,7 @@ std::string DhtCategory::message(int ev) const
   using category = error::DhtCategory;
 
   switch (static_cast<category>(ev)) {
-    case category::Failed: return "failed";
+    case category::BadResponse: return "Bad response from sensor";
   }
 
   return "Undefined error";
