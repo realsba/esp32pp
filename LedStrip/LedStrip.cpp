@@ -1,9 +1,9 @@
 #include "LedStrip.hpp"
 
-#include "driver/rmt_tx.h"
+#include <driver/rmt_tx.h>
 
-#include "esp_log.h"
-#include "esp_attr.h"
+#include <esp_log.h>
+#include <esp_attr.h>
 
 LedStripConfig::LedStripConfig(
   std::chrono::nanoseconds t0h,

@@ -3,7 +3,7 @@
 
 #include <chrono>
 
-#include "driver/rmt_encoder.h"
+#include <driver/rmt_encoder.h>
 
 struct LedStripConfig
 {
