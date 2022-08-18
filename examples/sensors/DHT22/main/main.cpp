@@ -9,7 +9,7 @@
 
 static const char* TAG = "main";
 
-extern "C" void app_main(void)
+extern "C" void app_main()
 {
   auto ret = nvs_flash_init();
   if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {

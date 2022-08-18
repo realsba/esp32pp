@@ -11,6 +11,7 @@ set(EXTRA_COMPONENT_DIRS
         Button
         CriticalSection
         DHT
+        HttpServer
         LedStrip
         Task
         WiFiStation

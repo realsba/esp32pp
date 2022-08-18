@@ -97,9 +97,13 @@ void WiFiStation::handleWiFiEvent(esp_event_base_t eventBase, int32_t eventId, v
       m_onStop();
     }
   } else if (eventId == WIFI_EVENT_STA_DISCONNECTED) {
+    ESP_LOGE(TAG, "Station disconnected");
     xEventGroupSetBits(m_wifiEventGroup, WIFI_FAIL_BIT);
+  } else {
+    ESP_LOGE(TAG, "Unexpected event: %ld", eventId);
   }
 }
+
 void WiFiStation::handleIpEvent(esp_event_base_t eventBase, int32_t eventId, void* eventData)
 {
   if (eventId == IP_EVENT_STA_GOT_IP) {
