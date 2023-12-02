@@ -22,11 +22,12 @@ void LedStrip::setup(uint8_t gpio, const LedStripConfig& config)
   using Duration = std::chrono::duration<int64_t, std::ratio<1, clockResolution>>;
 
   rmt_tx_channel_config_t channelConfig = {
-    .gpio_num = gpio,
+    .gpio_num = static_cast<gpio_num_t>(gpio),
     .clk_src = RMT_CLK_SRC_DEFAULT,
     .resolution_hz = clockResolution,
     .mem_block_symbols = 64,
     .trans_queue_depth = 4,
+    .intr_priority = 0,
     .flags = {
       .invert_out = false,
       .with_dma = false,
@@ -72,7 +73,8 @@ bool LedStrip::transmit(const void* data, size_t dataSize)
   rmt_transmit_config_t config = {
     .loop_count = 0,
     .flags = {
-      .eot_level = 0
+      .eot_level = 0,
+      .queue_nonblocking = 0
     }
   };
   return rmt_transmit(m_channel, &m_encoder, data, dataSize, &config) == ESP_OK;

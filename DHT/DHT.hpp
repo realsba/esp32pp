@@ -38,9 +38,9 @@ protected:
   uint8_t m_data[5] {};
 
 private:
-  static uint s_nextId;
+  static uint32_t s_nextId;
 
-  uint m_id = s_nextId;
+  uint32_t m_id = s_nextId;
   rmt_symbol_word_t m_symbols[64];
   Task m_task {[this] { readSensor(); }, "DHT:" + std::to_string(m_id)};
   Handler m_handler;

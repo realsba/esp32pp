@@ -9,7 +9,7 @@
 
 static const char* TAG = "DHT";
 
-uint DHT::s_nextId {0};
+uint32_t DHT::s_nextId {0};
 
 DHT::~DHT()
 {
@@ -28,6 +28,7 @@ void DHT::setup(gpio_num_t gpio, uint32_t clockResolution)
     .clk_src = RMT_CLK_SRC_DEFAULT,
     .resolution_hz = clockResolution,
     .mem_block_symbols = 64,
+    .intr_priority = 0,
     .flags = {
       .invert_in = false,
       .with_dma = false,
@@ -51,7 +52,8 @@ void DHT::read(Handler&& handler)
 {
   const static rmt_receive_config_t config = {
     .signal_range_min_ns = 5000,
-    .signal_range_max_ns = 120000
+    .signal_range_max_ns = 120000,
+    .flags = {.en_partial_rx = 0}
   };
 
   m_handler = std::move(handler);

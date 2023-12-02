@@ -1,28 +1,7 @@
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
-
-.config
-*.o
-*.pyc
+# Clion IDE CMake build & config
+.idea/
+build/
+cmake-build-*/
 
 sdkconfig
 sdkconfig.old
-
-# gcov coverage reports
-*.gcda
-*.gcno
-coverage.info
-coverage_report/
-
-# Clion IDE CMake build & config
-.idea/
-cmake-build-*/
