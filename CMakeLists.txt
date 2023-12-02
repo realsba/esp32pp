@@ -12,6 +12,7 @@ set(EXTRA_COMPONENT_DIRS
         DHT
         HttpServer
         LedStrip
+        RF433
         Task
         WiFiStation
         )
