@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS "LedStrip.cpp"
+    SRCS "Ina226.cpp"
     INCLUDE_DIRS .
-    REQUIRES driver
+    REQUIRES I2C
 )

@@ -20,5 +20,6 @@ HttpServer::~HttpServer()
 
 void HttpServer::addUriHandler(const httpd_uri_t& httpdUri)
 {
-  httpd_register_uri_handler(m_server, &httpdUri);
+  ESP_LOGI(TAG, "addUriHandler: %s", httpdUri.uri);
+  ESP_ERROR_CHECK(httpd_register_uri_handler(m_server, &httpdUri));
 }

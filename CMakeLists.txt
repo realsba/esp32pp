@@ -6,16 +6,18 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(EXTRA_COMPONENT_DIRS
-        $ENV{IDF_PATH}/components
-        Button
-        CriticalSection
-        DHT
-        HttpServer
-        LedStrip
-        RF433
-        Task
-        WiFiStation
-        )
+    $ENV{IDF_PATH}/components
+    Button
+    CriticalSection
+    DHT
+    HttpServer
+    I2C
+    Ina226
+    LedStrip
+    RF433
+    Task
+    WiFiStation
+)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 

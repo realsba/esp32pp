@@ -1,5 +1,6 @@
-idf_component_register(SRCS "Button.cpp"
-        INCLUDE_DIRS .
-        REQUIRES Task driver
-        PRIV_REQUIRES CriticalSection
-        )
+idf_component_register(
+    SRCS "Button.cpp"
+    INCLUDE_DIRS .
+    REQUIRES driver Task
+    PRIV_REQUIRES CriticalSection
+)
