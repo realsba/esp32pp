@@ -14,6 +14,7 @@ set(EXTRA_COMPONENT_DIRS
     I2C
     Ina226
     LedStrip
+    PwmController
     RF433
     Task
     WiFiStation
