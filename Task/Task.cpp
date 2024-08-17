@@ -2,7 +2,7 @@
 
 #include <esp_log.h>
 
-static const char* TAG = "Task";
+constexpr auto TAG = "Task";
 
 Task::Task(Task::Function func, std::string name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId)
   : m_function(std::move(func))

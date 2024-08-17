@@ -1,5 +1,5 @@
-#ifndef PWMCONTROLLER_HPP
-#define PWMCONTROLLER_HPP
+#ifndef ESP32PP_PWMCONTROLLER_HPP
+#define ESP32PP_PWMCONTROLLER_HPP
 
 #include <driver/ledc.h>
 
@@ -18,4 +18,4 @@ private:
   ledc_channel_config_t         m_ledcChannel {};
 };
 
-#endif // PWMCONTROLLER_HPP
+#endif // ESP32PP_PWMCONTROLLER_HPP

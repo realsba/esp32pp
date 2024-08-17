@@ -1,7 +1,7 @@
-#ifndef I2CBUS_HPP
-#define I2CBUS_HPP
+#ifndef ESP32PP_I2CBUS_HPP
+#define ESP32PP_I2CBUS_HPP
 
-#include "driver/i2c_master.h"
+#include <driver/i2c_master.h>
 
 class I2CBus
 {
@@ -23,4 +23,4 @@ private:
 };
 
 
-#endif // I2CBUS_HPP
+#endif // ESP32PP_I2CBUS_HPP

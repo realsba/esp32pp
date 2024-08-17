@@ -2,7 +2,7 @@
 
 #include <esp_log.h>
 
-constexpr const char* TAG = "WiFiStation";
+constexpr auto TAG = "WiFiStation";
 
 constexpr uint32_t WIFI_CONNECTED_BIT = BIT0;
 constexpr uint32_t WIFI_FAIL_BIT = BIT1;

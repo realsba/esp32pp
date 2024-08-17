@@ -7,7 +7,7 @@
 
 #include <limits>
 
-static const char* TAG = "DHT";
+constexpr auto TAG = "DHT";
 
 uint32_t DHT::s_nextId {0};
 
@@ -32,7 +32,8 @@ void DHT::setup(gpio_num_t gpio, uint32_t clockResolution)
     .flags = {
       .invert_in = false,
       .with_dma = false,
-      .io_loop_back = false
+      .io_loop_back = false,
+      .backup_before_sleep = true
     }
   };
   ESP_ERROR_CHECK(rmt_new_rx_channel(&channelConfig, &m_channel));

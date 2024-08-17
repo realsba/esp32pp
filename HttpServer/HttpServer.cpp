@@ -2,7 +2,7 @@
 
 #include <esp_log.h>
 
-static const char* TAG = "HttpServer";
+constexpr auto TAG = "HttpServer";
 
 HttpServer::HttpServer()
 {

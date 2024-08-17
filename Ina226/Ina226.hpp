@@ -1,9 +1,9 @@
-#ifndef INA226_HPP
-#define INA226_HPP
+#ifndef ESP32PP_INA226_HPP
+#define ESP32PP_INA226_HPP
 
 #include <string>
 
-#include "driver/i2c_master.h"
+#include <driver/i2c_master.h>
 
 class I2CBus;
 
@@ -43,6 +43,7 @@ private:
   i2c_master_dev_handle_t       m_handle {nullptr};
   double                        m_shuntResistorValue {0.1};
   double                        m_currentLSB {0};
-  double                        m_powerLSB {0};};
+  double                        m_powerLSB {0};
+};
 
-#endif // INA226_HPP
+#endif // ESP32PP_INA226_HPP

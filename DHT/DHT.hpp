@@ -4,10 +4,8 @@
 #include "Task.hpp"
 
 #include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
 
 #include <driver/rmt_types.h>
-#include <driver/rmt_rx.h>
 #include <driver/gpio.h>
 
 #include <functional>
