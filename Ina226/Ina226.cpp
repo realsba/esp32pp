@@ -3,6 +3,8 @@
 
 #include "esp_log.h"
 
+namespace esp32pp {
+
 std::string Ina226::toString(Register reg)
 {
   switch (reg) {
@@ -85,3 +87,5 @@ float Ina226::getCurrent()
   auto raw = readRegister(Register::Current);
   return raw * m_currentLSB;
 }
+
+} // namespace esp32pp

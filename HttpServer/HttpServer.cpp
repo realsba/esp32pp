@@ -2,6 +2,8 @@
 
 #include <esp_log.h>
 
+namespace esp32pp {
+
 constexpr auto TAG = "HttpServer";
 
 HttpServer::HttpServer()
@@ -23,3 +25,5 @@ void HttpServer::addUriHandler(const httpd_uri_t& httpdUri)
   ESP_LOGI(TAG, "addUriHandler: %s", httpdUri.uri);
   ESP_ERROR_CHECK(httpd_register_uri_handler(m_server, &httpdUri));
 }
+
+} // namespace esp32pp

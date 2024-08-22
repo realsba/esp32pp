@@ -2,6 +2,8 @@
 
 #include <freertos/task.h>
 
+namespace esp32pp {
+
 CriticalSection::CriticalSection(portMUX_TYPE& mux)
   : m_mux(mux)
 {
@@ -23,3 +25,5 @@ CriticalSectionIsr::~CriticalSectionIsr()
 {
   taskEXIT_CRITICAL_ISR(&m_mux);
 }
+
+} // namespace esp32pp

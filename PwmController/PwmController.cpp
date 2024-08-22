@@ -1,5 +1,7 @@
 #include "PwmController.hpp"
 
+namespace esp32pp {
+
 PwmController::PwmController(gpio_num_t pin, uint32_t frequency, uint32_t dutyCycle)
   : m_pin(pin), m_frequency(frequency), m_dutyCycle(dutyCycle)
 {
@@ -39,3 +41,5 @@ void PwmController::init()
   ledc_set_duty(LEDC_HIGH_SPEED_MODE, m_ledcChannel.channel, m_dutyCycle);
   ledc_update_duty(LEDC_HIGH_SPEED_MODE, m_ledcChannel.channel);
 }
+
+} // namespace esp32pp

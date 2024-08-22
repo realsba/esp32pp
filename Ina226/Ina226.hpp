@@ -5,6 +5,8 @@
 
 #include <driver/i2c_master.h>
 
+namespace esp32pp {
+
 class I2CBus;
 
 class Ina226
@@ -45,5 +47,7 @@ private:
   double                        m_currentLSB {0};
   double                        m_powerLSB {0};
 };
+
+} // namespace esp32pp
 
 #endif // ESP32PP_INA226_HPP

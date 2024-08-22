@@ -4,6 +4,8 @@
 
 #include <esp_log.h>
 
+namespace esp32pp {
+
 using namespace std;
 
 Button::Button(gpio_num_t gpio, std::string name)
@@ -81,3 +83,5 @@ void Button::debounce()
 
   m_task.suspend();
 }
+
+} // namespace esp32pp

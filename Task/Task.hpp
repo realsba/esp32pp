@@ -7,6 +7,8 @@
 #include <functional>
 #include <string>
 
+namespace esp32pp {
+
 class Task
 {
 public:
@@ -33,5 +35,7 @@ private:
   TaskHandle_t m_handle {nullptr};
   volatile bool m_running {false};
 };
+
+} // namespace esp32pp
 
 #endif // ESP32PP_TASK_HPP

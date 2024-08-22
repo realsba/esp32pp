@@ -11,6 +11,8 @@
 #include <functional>
 #include <system_error>
 
+namespace esp32pp {
+
 class DHT
 {
 public:
@@ -39,7 +41,7 @@ private:
   static uint32_t s_nextId;
 
   uint32_t m_id = s_nextId;
-  rmt_symbol_word_t m_symbols[64];
+  rmt_symbol_word_t m_symbols[64] {};
   Task m_task {[this] { readSensor(); }, "DHT:" + std::to_string(m_id)};
   Handler m_handler;
   rmt_channel_handle_t m_channel {nullptr};
@@ -90,12 +92,9 @@ inline std::error_code make_error_code(DhtCategory e)
 }
 
 } // namespace error
-
-namespace std {
+} // namespace esp32pp
 
 template<>
-struct is_error_code_enum<error::DhtCategory> : public true_type {};
-
-} // namespace std
+struct std::is_error_code_enum<esp32pp::error::DhtCategory> : true_type {};
 
 #endif // ESP32PP_DHT_HPP

@@ -2,6 +2,8 @@
 
 #include <esp_log.h>
 
+namespace esp32pp {
+
 constexpr auto TAG = "WiFiStation";
 
 constexpr uint32_t WIFI_CONNECTED_BIT = BIT0;
@@ -115,3 +117,5 @@ void WiFiStation::handleIpEvent(esp_event_base_t eventBase, int32_t eventId, voi
     }
   }
 }
+
+} // namespace esp32pp

@@ -2,6 +2,8 @@
 
 #include <esp_log.h>
 
+namespace esp32pp {
+
 constexpr auto TAG = "Task";
 
 Task::Task(Task::Function func, std::string name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId)
@@ -56,3 +58,5 @@ void Task::run()
 
   ESP_LOGI(TAG, "<< %s", m_name.c_str());
 }
+
+} // namespace esp32pp

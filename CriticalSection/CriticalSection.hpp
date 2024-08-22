@@ -4,6 +4,8 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/portmacro.h>
 
+namespace esp32pp {
+
 class CriticalSection
 {
 public:
@@ -23,5 +25,7 @@ public:
 private:
   portMUX_TYPE& m_mux;
 };
+
+} // namespace esp32pp
 
 #endif // ESP32PP_CRITICALSECTION_HPP

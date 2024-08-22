@@ -5,6 +5,8 @@
 
 #include <driver/rmt_encoder.h>
 
+namespace esp32pp {
+
 class RF433
 {
 public:
@@ -38,5 +40,7 @@ private:
   rmt_symbol_word_t m_resetCode {};
   State m_state {State::SendData};
 };
+
+} // namespace esp32pp
 
 #endif // ESP32PP_RF433_HPP

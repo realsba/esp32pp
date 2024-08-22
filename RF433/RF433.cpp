@@ -5,6 +5,8 @@
 #include <esp_log.h>
 #include <esp_attr.h>
 
+namespace esp32pp {
+
 using namespace std::chrono_literals;
 
 void RF433::setup(uint8_t gpio)
@@ -124,3 +126,5 @@ esp_err_t IRAM_ATTR RF433::reset()
   m_state = State::SendData;
   return ESP_OK;
 }
+
+} // namespace esp32pp

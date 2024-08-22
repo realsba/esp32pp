@@ -3,6 +3,8 @@
 
 #include <esp_http_server.h>
 
+namespace esp32pp {
+
 class HttpServer
 {
 public:
@@ -14,5 +16,7 @@ public:
 private:
   httpd_handle_t m_server {nullptr};
 };
+
+} // namespace esp32pp
 
 #endif // ESP32PP_HTTPSERVER_HPP

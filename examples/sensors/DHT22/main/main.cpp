@@ -20,7 +20,7 @@ extern "C" void app_main()
   ESP_ERROR_CHECK(esp_netif_init());
   ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-  auto sensor = std::make_unique<DHT22>();
+  auto sensor = std::make_unique<esp32pp::DHT22>();
   sensor->setup(static_cast<gpio_num_t>(CONFIG_RMT_GPIO_NUM), 1000000);
 
   auto onReadSensor = [&](std::error_code ec, float humidity, float temperature)

@@ -7,6 +7,8 @@
 
 #include <functional>
 
+namespace esp32pp {
+
 class Button
 {
 public:
@@ -24,7 +26,6 @@ private:
   void handleInterrupt();
   void debounce();
 
-private:
   const gpio_num_t m_gpio;
   const std::string m_name;
   portMUX_TYPE m_mux = portMUX_INITIALIZER_UNLOCKED;
@@ -33,5 +34,7 @@ private:
   Handler m_onPressed;
   Handler m_onReleased;
 };
+
+} // namespace esp32pp
 
 #endif // ESP32PP_BUTTON_HPP

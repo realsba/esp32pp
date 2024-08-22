@@ -5,9 +5,10 @@
 
 #include <freertos/event_groups.h>
 
-#include <system_error>
 #include <functional>
 #include <string>
+
+namespace esp32pp {
 
 class WiFiStation
 {
@@ -29,7 +30,6 @@ private:
   void handleWiFiEvent(esp_event_base_t eventBase, int32_t eventId, void* eventData);
   void handleIpEvent(esp_event_base_t eventBase, int32_t eventId, void* eventData);
 
-private:
   Handler m_onConnect;
   Handler m_onStop;
   std::string m_ssid;
@@ -39,5 +39,7 @@ private:
   esp_event_handler_instance_t m_eventWiFi {nullptr};
   esp_event_handler_instance_t m_eventIp {nullptr};
 };
+
+} // namespace esp32pp
 
 #endif // ESP32PP_WIFI_STATION_HPP

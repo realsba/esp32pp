@@ -3,6 +3,8 @@
 #include "esp_err.h"
 #include "esp_log.h"
 
+namespace esp32pp {
+
 I2CBus::I2CBus(i2c_port_t port, gpio_num_t sda, gpio_num_t scl, uint32_t freq)
   : m_port(port)
   , m_sda(sda)
@@ -55,3 +57,5 @@ void I2CBus::deinit()
     i2c_del_master_bus(m_busHandle);
   }
 }
+
+} // namespace esp32pp

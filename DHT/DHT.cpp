@@ -7,6 +7,8 @@
 
 #include <limits>
 
+namespace esp32pp {
+
 constexpr auto TAG = "DHT";
 
 uint32_t DHT::s_nextId {0};
@@ -217,3 +219,4 @@ std::string DhtCategory::message(int ev) const
 
 } // namespace detail
 } // namespace error
+} // namespace esp32pp

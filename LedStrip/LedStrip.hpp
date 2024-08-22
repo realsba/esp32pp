@@ -5,6 +5,8 @@
 
 #include <driver/rmt_encoder.h>
 
+namespace esp32pp {
+
 struct LedStripConfig
 {
   LedStripConfig(
@@ -24,17 +26,17 @@ struct LedStripConfig
 
 using namespace std::chrono_literals;
 
-struct WS2812Config : public LedStripConfig
+struct WS2812Config : LedStripConfig
 {
   WS2812Config() : LedStripConfig(350ns, 700ns, 800ns, 600ns, 50us) {}
 };
 
-struct WS2812BConfig : public LedStripConfig
+struct WS2812BConfig : LedStripConfig
 {
   WS2812BConfig() : LedStripConfig(400ns, 800ns, 850ns, 450ns, 50us) {}
 };
 
-struct SK6812Config : public LedStripConfig
+struct SK6812Config : LedStripConfig
 {
   SK6812Config() : LedStripConfig(300ns, 600ns, 900ns, 600ns, 80us) {}
 };
@@ -72,5 +74,7 @@ private:
   rmt_symbol_word_t m_resetCode {};
   State m_state {State::SendRgbData};
 };
+
+} // namespace esp32pp
 
 #endif // ESP32PP_LEDSTRIP_HPP

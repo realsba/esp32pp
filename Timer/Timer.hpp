@@ -29,6 +29,6 @@ private:
   bool m_isRunning {false};
 };
 
-} // esp32pp
+} // namespace esp32pp
 
 #endif // ESP32PP_TIMER_HPP

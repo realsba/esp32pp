@@ -5,6 +5,8 @@
 #include <esp_log.h>
 #include <esp_attr.h>
 
+namespace esp32pp {
+
 LedStripConfig::LedStripConfig(
   std::chrono::nanoseconds t0h,
   std::chrono::nanoseconds t1h,
@@ -134,3 +136,5 @@ esp_err_t IRAM_ATTR LedStrip::reset()
   m_state = State::SendRgbData;
   return ESP_OK;
 }
+
+} // namespace esp32pp
