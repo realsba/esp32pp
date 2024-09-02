@@ -9,8 +9,7 @@
 
 namespace esp32pp {
 
-class Task
-{
+class Task {
 public:
   using Function = std::function<void()>;
 

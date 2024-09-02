@@ -6,8 +6,7 @@
 
 namespace esp32pp {
 
-class CriticalSection
-{
+class CriticalSection {
 public:
   explicit CriticalSection(portMUX_TYPE& mux);
   ~CriticalSection();
@@ -16,8 +15,7 @@ private:
   portMUX_TYPE& m_mux;
 };
 
-class CriticalSectionIsr
-{
+class CriticalSectionIsr {
 public:
   explicit CriticalSectionIsr(portMUX_TYPE& mux);
   ~CriticalSectionIsr();

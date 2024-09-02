@@ -9,8 +9,7 @@ namespace esp32pp {
 
 class I2CBus;
 
-class Ina226
-{
+class Ina226 {
 public:
   enum class Register : uint8_t {
     Configuration   = 0x00,

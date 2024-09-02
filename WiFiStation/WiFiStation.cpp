@@ -67,11 +67,11 @@ void WiFiStation::start()
   );
 
   if (bits & WIFI_CONNECTED_BIT) {
-    ESP_LOGI(TAG, "Connected to ap SSID:%s password:%s", m_ssid.c_str(), m_password.c_str());
+    ESP_LOGI(TAG, "Connected to AP SSID: %s password: ****************", m_ssid.c_str());
   } else if (bits & WIFI_FAIL_BIT) {
-    ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s", m_ssid.c_str(), m_password.c_str());
+    ESP_LOGI(TAG, "Failed to connect to SSID: %s", m_ssid.c_str());
   } else {
-    ESP_LOGE(TAG, "UNEXPECTED EVENT");
+    ESP_LOGE(TAG, "Unexpected event");
   }
 }
 

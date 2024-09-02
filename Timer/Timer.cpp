@@ -4,6 +4,8 @@
 
 namespace esp32pp {
 
+constexpr auto TAG = "Timer";
+
 Timer::Timer(Callback callback)
   : m_callback(std::move(callback))
 {
@@ -17,7 +19,7 @@ Timer::Timer(Callback callback)
 
   auto err = esp_timer_create(&timerArgs, &m_timerHandle);
   if (err != ESP_OK) {
-    ESP_LOGE("Timer", "Failed to create timer: %s", esp_err_to_name(err));
+    ESP_LOGE(TAG, "Failed to create timer: %s", esp_err_to_name(err));
   }
 }
 
@@ -32,7 +34,7 @@ Timer::~Timer()
 void Timer::startPeriodic(Duration interval)
 {
   if (m_timerHandle && !m_isRunning) {
-    esp_timer_start_periodic(m_timerHandle, interval.count());
+    ESP_ERROR_CHECK(esp_timer_start_periodic(m_timerHandle, interval.count()));
     m_isRunning = true;
   }
 }
@@ -40,7 +42,7 @@ void Timer::startPeriodic(Duration interval)
 void Timer::startOnce(Duration timeout)
 {
   if (m_timerHandle && !m_isRunning) {
-    esp_timer_start_once(m_timerHandle, timeout.count());
+    ESP_ERROR_CHECK(esp_timer_start_once(m_timerHandle, timeout.count()));
     m_isRunning = true;
   }
 }

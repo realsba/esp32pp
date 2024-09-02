@@ -5,8 +5,7 @@
 
 namespace esp32pp {
 
-class I2CBus
-{
+class I2CBus {
 public:
   I2CBus(i2c_port_t port, gpio_num_t sda, gpio_num_t scl, uint32_t freq);
   ~I2CBus();

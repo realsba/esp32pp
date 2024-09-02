@@ -7,8 +7,7 @@
 
 namespace esp32pp {
 
-struct LedStripConfig
-{
+struct LedStripConfig {
   LedStripConfig(
     std::chrono::nanoseconds t0h,
     std::chrono::nanoseconds t1h,
@@ -26,23 +25,19 @@ struct LedStripConfig
 
 using namespace std::chrono_literals;
 
-struct WS2812Config : LedStripConfig
-{
+struct WS2812Config : LedStripConfig {
   WS2812Config() : LedStripConfig(350ns, 700ns, 800ns, 600ns, 50us) {}
 };
 
-struct WS2812BConfig : LedStripConfig
-{
+struct WS2812BConfig : LedStripConfig {
   WS2812BConfig() : LedStripConfig(400ns, 800ns, 850ns, 450ns, 50us) {}
 };
 
-struct SK6812Config : LedStripConfig
-{
+struct SK6812Config : LedStripConfig {
   SK6812Config() : LedStripConfig(300ns, 600ns, 900ns, 600ns, 80us) {}
 };
 
-class LedStrip
-{
+class LedStrip {
 public:
   ~LedStrip();
 
@@ -58,8 +53,7 @@ private:
   );
   static esp_err_t reset_led_strip(rmt_encoder_t* encoder);
 
-  enum class State
-  {
+  enum class State {
     SendRgbData,
     SendResetCode
   };

@@ -13,8 +13,7 @@
 
 namespace esp32pp {
 
-class DHT
-{
+class DHT {
 public:
   using Handler = std::function<void(std::error_code ec, float humidity, float temperature)>;
 
@@ -48,8 +47,7 @@ private:
   gpio_num_t m_pin {GPIO_NUM_0};
 };
 
-class DHT11 : public DHT
-{
+class DHT11 : public DHT {
 public:
   explicit DHT11();
 
@@ -58,23 +56,20 @@ private:
   float humidity() override;
 };
 
-class DHT22 : public DHT
-{
+class DHT22 : public DHT {
   float temperature() override;
   float humidity() override;
 };
 
 namespace error {
 
-enum class DhtCategory
-{
+enum class DhtCategory {
   BadResponse = 1
 };
 
 namespace detail {
 
-class DhtCategory : public std::error_category
-{
+class DhtCategory : public std::error_category {
 public:
   DhtCategory() = default;
 

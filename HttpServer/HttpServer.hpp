@@ -5,8 +5,7 @@
 
 namespace esp32pp {
 
-class HttpServer
-{
+class HttpServer {
 public:
   explicit HttpServer();
   ~HttpServer();

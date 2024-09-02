@@ -7,8 +7,7 @@
 
 namespace esp32pp {
 
-class RF433
-{
+class RF433 {
 public:
   ~RF433();
 
@@ -24,8 +23,7 @@ private:
   );
   static esp_err_t reset(rmt_encoder_t* encoder);
 
-  enum class State
-  {
+  enum class State {
     SendData,
     SendResetCode
   };

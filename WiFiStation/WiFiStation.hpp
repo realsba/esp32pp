@@ -10,8 +10,7 @@
 
 namespace esp32pp {
 
-class WiFiStation
-{
+class WiFiStation {
 public:
   using Handler = std::function<void()>;
 

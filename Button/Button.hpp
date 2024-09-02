@@ -9,8 +9,7 @@
 
 namespace esp32pp {
 
-class Button
-{
+class Button {
 public:
   using Handler = std::function<void()>;
 
