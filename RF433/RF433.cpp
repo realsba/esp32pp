@@ -11,7 +11,7 @@ using namespace std::chrono_literals;
 
 void RF433::setup(uint8_t gpio)
 {
-  constexpr const uint32_t clockResolution {10000000};
+  constexpr uint32_t clockResolution {10000000};
   using Duration = std::chrono::duration<int64_t, std::ratio<1, clockResolution>>;
 
   rmt_tx_channel_config_t channelConfig = {
@@ -25,7 +25,8 @@ void RF433::setup(uint8_t gpio)
       .invert_out = false,
       .with_dma = false,
       .io_loop_back = false,
-      .io_od_mode = false
+      .io_od_mode = false,
+      .backup_before_sleep = true
     }
   };
   ESP_ERROR_CHECK(rmt_new_tx_channel(&channelConfig, &m_channel));

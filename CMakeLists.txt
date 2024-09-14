@@ -15,10 +15,11 @@ set(EXTRA_COMPONENT_DIRS
     I2C
     Ina226
     LedStrip
-    Timer
     PwmController
     RF433
     Task
+    TelegramBot
+    Timer
     WiFiStation
 )
 

@@ -1,7 +1,9 @@
-# Clion IDE CMake build & config
 .idea/
+
 build/
 cmake-build-*/
 
+managed_components/
+dependencies.lock
 sdkconfig
 sdkconfig.old

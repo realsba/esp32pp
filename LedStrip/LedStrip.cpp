@@ -20,7 +20,7 @@ LedStripConfig::LedStripConfig(
 
 void LedStrip::setup(uint8_t gpio, const LedStripConfig& config)
 {
-  constexpr const uint32_t clockResolution {10000000};
+  constexpr uint32_t clockResolution {10000000};
   using Duration = std::chrono::duration<int64_t, std::ratio<1, clockResolution>>;
 
   rmt_tx_channel_config_t channelConfig = {
