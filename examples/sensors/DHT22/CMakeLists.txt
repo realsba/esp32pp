@@ -7,9 +7,9 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(EXTRA_COMPONENT_DIRS
-        ../../../DHT
-        ../../../Task
-        )
+    ../../../DHT
+    ../../../Task
+)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 

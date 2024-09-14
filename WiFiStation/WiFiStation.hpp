@@ -12,31 +12,33 @@ namespace esp32pp {
 
 class WiFiStation {
 public:
-  using Handler = std::function<void()>;
+    using Handler = std::function<void()>;
 
-  explicit WiFiStation(Handler&& onConnect, Handler&& onStop);
-  ~WiFiStation();
+    explicit WiFiStation(Handler&& onConnect, Handler&& onStop);
+    ~WiFiStation();
 
-  void setSSID(const std::string& ssid);
-  void setPassword(const std::string& password);
+    void setSSID(const std::string& ssid);
+    void setPassword(const std::string& password);
 
-  void start();
-  void stop();
+    void start();
+    void stop();
 
 private:
-  static void wifiEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData);
-  static void ipEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData);
-  void handleWiFiEvent(esp_event_base_t eventBase, int32_t eventId, void* eventData);
-  void handleIpEvent(esp_event_base_t eventBase, int32_t eventId, void* eventData);
+    static void wifiEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData);
+    static void ipEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData);
+    void handleWiFiEvent(esp_event_base_t eventBase, int32_t eventId, void* eventData);
+    void handleIpEvent(esp_event_base_t eventBase, int32_t eventId, void* eventData);
 
-  Handler m_onConnect;
-  Handler m_onStop;
-  std::string m_ssid;
-  std::string m_password;
-  esp_netif_t* m_netif {nullptr};
-  EventGroupHandle_t m_wifiEventGroup {nullptr};
-  esp_event_handler_instance_t m_eventWiFi {nullptr};
-  esp_event_handler_instance_t m_eventIp {nullptr};
+    // @formatter:off
+    Handler                         m_onConnect;
+    Handler                         m_onStop;
+    std::string                     m_ssid;
+    std::string                     m_password;
+    esp_netif_t*                    m_netif {nullptr};
+    EventGroupHandle_t              m_wifiEventGroup {nullptr};
+    esp_event_handler_instance_t    m_eventWiFi {nullptr};
+    esp_event_handler_instance_t    m_eventIp {nullptr};
+    // @formatter:on
 };
 
 } // namespace esp32pp

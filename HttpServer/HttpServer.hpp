@@ -7,13 +7,13 @@ namespace esp32pp {
 
 class HttpServer {
 public:
-  explicit HttpServer();
-  ~HttpServer();
+    HttpServer();
+    ~HttpServer();
 
-  void addUriHandler(const httpd_uri_t& httpdUri);
+    void addUriHandler(const httpd_uri_t& httpdUri);
 
 private:
-  httpd_handle_t m_server {nullptr};
+    httpd_handle_t m_server {nullptr};
 };
 
 } // namespace esp32pp

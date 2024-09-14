@@ -11,27 +11,29 @@ namespace esp32pp {
 
 class Button {
 public:
-  using Handler = std::function<void()>;
+    using Handler = std::function<void()>;
 
-  explicit Button(gpio_num_t gpio, std::string name);
-  ~Button();
+    explicit Button(gpio_num_t gpio, std::string name);
+    ~Button();
 
-  void setPressedHandler(Handler&& handler);
-  void setReleasedHandler(Handler&& handler);
+    void setPressedHandler(Handler&& handler);
+    void setReleasedHandler(Handler&& handler);
 
 private:
-  static void gpio_interrupt_handler(void* arg);
+    static void gpio_interrupt_handler(void* arg);
 
-  void handleInterrupt();
-  void debounce();
+    void handleInterrupt();
+    void debounce();
 
-  const gpio_num_t m_gpio;
-  const std::string m_name;
-  portMUX_TYPE m_mux = portMUX_INITIALIZER_UNLOCKED;
-  Task m_task;
-  volatile uint32_t m_debounceTimeout {0};
-  Handler m_onPressed;
-  Handler m_onReleased;
+    // @formatter:off
+    const gpio_num_t            m_gpio;
+    const std::string           m_name;
+    portMUX_TYPE                m_mux = portMUX_INITIALIZER_UNLOCKED;
+    Task                        m_task;
+    volatile uint32_t           m_debounceTimeout {0};
+    Handler                     m_onPressed;
+    Handler                     m_onReleased;
+    // @formatter:on
 };
 
 } // namespace esp32pp

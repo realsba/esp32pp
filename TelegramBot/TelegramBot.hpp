@@ -9,13 +9,13 @@ namespace esp32pp {
 
 class TelegramBot {
 public:
-  explicit TelegramBot(const std::string& token);
-  ~TelegramBot();
+    explicit TelegramBot(const std::string& token);
+    ~TelegramBot();
 
-  void sendMessage(const std::string& channelId, const std::string& message);
+    void sendMessage(const std::string& channelId, const std::string& message);
 
 private:
-  esp_http_client_handle_t      m_httpClient;
+    esp_http_client_handle_t m_httpClient;
 };
 
 } // namespace esp32pp
