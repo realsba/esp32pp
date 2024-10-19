@@ -6,21 +6,20 @@ namespace esp32pp {
 
 constexpr auto TAG = "WiFiStation";
 
-constexpr uint32_t WIFI_CONNECTED_BIT = BIT0;
-constexpr uint32_t WIFI_FAIL_BIT      = BIT1;
-
-WiFiStation::WiFiStation(Handler&& onConnect, Handler&& onStop)
-    : m_onConnect(std::move(onConnect))
+WiFiStation::WiFiStation(asio::io_context& ioContext, Handler&& onConnect, Handler&& onStop)
+    : m_ioContext(ioContext)
+    , m_retryTimer(ioContext)
+    , m_onConnect(std::move(onConnect))
     , m_onStop(std::move(onStop))
 {
-    m_netif                = esp_netif_create_default_wifi_sta();
+    m_netif = esp_netif_create_default_wifi_sta();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
         WIFI_EVENT, ESP_EVENT_ANY_ID, &WiFiStation::wifiEventHandler, this, &m_eventWiFi
     ));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        IP_EVENT, IP_EVENT_STA_GOT_IP, &WiFiStation::ipEventHandler, this, & m_eventIp
+        IP_EVENT, IP_EVENT_STA_GOT_IP, &WiFiStation::ipEventHandler, this, &m_eventIp
     ));
 }
 
@@ -28,7 +27,7 @@ WiFiStation::~WiFiStation()
 {
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, m_eventIp));
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, m_eventWiFi));
-    vEventGroupDelete(m_wifiEventGroup);
+    esp_wifi_stop();
     esp_wifi_deinit();
     esp_netif_destroy_default_wifi(m_netif);
 }
@@ -45,9 +44,7 @@ void WiFiStation::setPassword(const std::string& password)
 
 void WiFiStation::start()
 {
-    ESP_LOGI(TAG, "Starting WiFi station");
-
-    m_wifiEventGroup = xEventGroupCreate();
+    ESP_LOGI(TAG, "Starting Wi-Fi station...");
 
     wifi_config_t wifiConfig = {};
     auto n = m_ssid.copy(reinterpret_cast<char*>(wifiConfig.sta.ssid), sizeof(wifiConfig.sta.ssid) - 1);
@@ -61,36 +58,27 @@ void WiFiStation::start()
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifiConfig));
     ESP_ERROR_CHECK(esp_wifi_start());
-
-    auto bits = xEventGroupWaitBits(
-        m_wifiEventGroup, WIFI_CONNECTED_BIT | WIFI_FAIL_BIT, pdFALSE, pdFALSE, portMAX_DELAY
-    );
-
-    if (bits & WIFI_CONNECTED_BIT) {
-        ESP_LOGI(TAG, "Connected to AP SSID: %s password: ****************", m_ssid.c_str());
-    } else if (bits & WIFI_FAIL_BIT) {
-        ESP_LOGI(TAG, "Failed to connect to SSID: %s", m_ssid.c_str());
-    } else {
-        ESP_LOGE(TAG, "Unexpected event");
-    }
 }
 
 void WiFiStation::stop()
 {
+    ESP_LOGI(TAG, "Stopping Wi-Fi station...");
     esp_wifi_stop();
 }
 
 void WiFiStation::wifiEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData)
 {
-    static_cast<WiFiStation*>(arg)->handleWiFiEvent(eventBase, eventId, eventData);
+    auto self = static_cast<WiFiStation*>(arg)->shared_from_this();
+    self->m_ioContext.post([=] { self->handleWiFiEvent(eventId); });
 }
 
 void WiFiStation::ipEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData)
 {
-    static_cast<WiFiStation*>(arg)->handleIpEvent(eventBase, eventId, eventData);
+    const auto self = static_cast<WiFiStation*>(arg)->shared_from_this();
+    self->m_ioContext.post([=] { self->handleIpEvent(eventId); });
 }
 
-void WiFiStation::handleWiFiEvent(esp_event_base_t eventBase, int32_t eventId, void* eventData)
+void WiFiStation::handleWiFiEvent(int32_t eventId)
 {
     if (eventId == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
@@ -99,23 +87,33 @@ void WiFiStation::handleWiFiEvent(esp_event_base_t eventBase, int32_t eventId, v
             m_onStop();
         }
     } else if (eventId == WIFI_EVENT_STA_DISCONNECTED) {
-        ESP_LOGE(TAG, "Station disconnected");
-        xEventGroupSetBits(m_wifiEventGroup, WIFI_FAIL_BIT);
-    } else {
-        ESP_LOGE(TAG, "Unexpected event: %ld", eventId);
+        ESP_LOGW(TAG, "Wi-Fi Disconnected. Scheduling reconnect...");
+        scheduleReconnect();
     }
 }
 
-void WiFiStation::handleIpEvent(esp_event_base_t eventBase, int32_t eventId, void* eventData)
+void WiFiStation::handleIpEvent(int32_t eventId)
 {
     if (eventId == IP_EVENT_STA_GOT_IP) {
-        auto* event = static_cast<ip_event_got_ip_t*>(eventData);
-        ESP_LOGI(TAG, "Station got ip:" IPSTR, IP2STR(&event->ip_info.ip));
-        xEventGroupSetBits(m_wifiEventGroup, WIFI_CONNECTED_BIT);
+        // auto* event = static_cast<ip_event_got_ip_t*>(eventData);
+        // ESP_LOGI(TAG, "Wi-Fi connected, got IP: " IPSTR, IP2STR(&event->ip_info.ip));
         if (m_onConnect) {
             m_onConnect();
         }
     }
+}
+
+void WiFiStation::scheduleReconnect()
+{
+    m_retryTimer.expires_after(std::chrono::seconds(10));
+    m_retryTimer.async_wait(
+        [self = shared_from_this()](const asio::error_code& ec)
+        {
+            if (!ec) {
+                esp_wifi_connect();
+            }
+        }
+    );
 }
 
 } // namespace esp32pp
