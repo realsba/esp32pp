@@ -25,9 +25,9 @@ private:
     static void timerCallback(void* arg);
 
     // @formatter:off
-    esp_timer_handle_t          m_timerHandle {};
-    Callback                    m_callback;
-    bool                        m_isRunning {false};
+    esp_timer_handle_t          _timerHandle {};
+    Callback                    _callback;
+    bool                        _isRunning {false};
     // @formatter:on
 };
 

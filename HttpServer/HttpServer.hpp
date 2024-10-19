@@ -13,7 +13,7 @@ public:
     void addUriHandler(const httpd_uri_t& httpdUri);
 
 private:
-    httpd_handle_t m_server {nullptr};
+    httpd_handle_t _server {nullptr};
 };
 
 } // namespace esp32pp

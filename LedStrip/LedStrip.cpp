@@ -38,7 +38,7 @@ void LedStrip::setup(uint8_t gpio, const LedStripConfig& config)
             .allow_pd = false
         }
     };
-    ESP_ERROR_CHECK(rmt_new_tx_channel(&channelConfig, &m_channel));
+    ESP_ERROR_CHECK(rmt_new_tx_channel(&channelConfig, &_channel));
 
     rmt_bytes_encoder_config_t bytesEncoderConfig;
     bytesEncoderConfig.bit0.duration0  = std::chrono::duration_cast<Duration>(config.T0H).count();
@@ -50,25 +50,25 @@ void LedStrip::setup(uint8_t gpio, const LedStripConfig& config)
     bytesEncoderConfig.bit1.duration1  = std::chrono::duration_cast<Duration>(config.T1L).count();
     bytesEncoderConfig.bit1.level1     = 0;
     bytesEncoderConfig.flags.msb_first = true;
-    ESP_ERROR_CHECK(rmt_new_bytes_encoder(&bytesEncoderConfig, &m_bytesEncoder));
+    ESP_ERROR_CHECK(rmt_new_bytes_encoder(&bytesEncoderConfig, &_bytesEncoder));
 
     rmt_copy_encoder_config_t copyEncoderConfig = {};
-    ESP_ERROR_CHECK(rmt_new_copy_encoder(&copyEncoderConfig, &m_copyEncoder));
+    ESP_ERROR_CHECK(rmt_new_copy_encoder(&copyEncoderConfig, &_copyEncoder));
 
-    auto ticks            = std::chrono::duration_cast<Duration>(config.RST).count() / 2;
-    m_resetCode.duration0 = ticks;
-    m_resetCode.level0    = 0;
-    m_resetCode.duration1 = ticks;
-    m_resetCode.level1    = 0;
+    auto ticks           = std::chrono::duration_cast<Duration>(config.RST).count() / 2;
+    _resetCode.duration0 = ticks;
+    _resetCode.level0    = 0;
+    _resetCode.duration1 = ticks;
+    _resetCode.level1    = 0;
 
-    rmt_enable(m_channel);
+    rmt_enable(_channel);
 }
 
 LedStrip::~LedStrip()
 {
-    rmt_del_channel(m_channel);
-    rmt_del_encoder(m_bytesEncoder);
-    rmt_del_encoder(m_copyEncoder);
+    rmt_del_channel(_channel);
+    rmt_del_encoder(_bytesEncoder);
+    rmt_del_encoder(_copyEncoder);
 }
 
 bool LedStrip::transmit(const void* data, size_t dataSize)
@@ -80,7 +80,7 @@ bool LedStrip::transmit(const void* data, size_t dataSize)
             .queue_nonblocking = 0
         }
     };
-    return rmt_transmit(m_channel, &m_encoder, data, dataSize, &config) == ESP_OK;
+    return rmt_transmit(_channel, &_encoder, data, dataSize, &config) == ESP_OK;
 }
 
 size_t IRAM_ATTR LedStrip::encode_led_strip(
@@ -104,11 +104,11 @@ size_t IRAM_ATTR LedStrip::encode(
     int state             = 0;
     size_t encodedSymbols = 0;
 
-    switch (m_state) {
+    switch (_state) {
         case State::SendRgbData:
-            encodedSymbols += m_bytesEncoder->encode(m_bytesEncoder, channel, data, dataSize, &sessionState);
+            encodedSymbols += _bytesEncoder->encode(_bytesEncoder, channel, data, dataSize, &sessionState);
             if (sessionState & RMT_ENCODING_COMPLETE) {
-                m_state = State::SendResetCode;
+                _state = State::SendResetCode;
             }
             if (sessionState & RMT_ENCODING_MEM_FULL) {
                 state |= RMT_ENCODING_MEM_FULL;
@@ -116,10 +116,10 @@ size_t IRAM_ATTR LedStrip::encode(
             }
         // fall-through
         case State::SendResetCode:
-            encodedSymbols += m_copyEncoder->encode(m_copyEncoder, channel, &m_resetCode, sizeof(m_resetCode),
+            encodedSymbols += _copyEncoder->encode(_copyEncoder, channel, &_resetCode, sizeof(_resetCode),
                 &sessionState);
             if (sessionState & RMT_ENCODING_COMPLETE) {
-                m_state = State::SendRgbData;
+                _state = State::SendRgbData;
                 state |= RMT_ENCODING_COMPLETE;
             }
             if (sessionState & RMT_ENCODING_MEM_FULL) {
@@ -133,9 +133,9 @@ size_t IRAM_ATTR LedStrip::encode(
 
 esp_err_t IRAM_ATTR LedStrip::reset()
 {
-    rmt_encoder_reset(m_bytesEncoder);
-    rmt_encoder_reset(m_copyEncoder);
-    m_state = State::SendRgbData;
+    rmt_encoder_reset(_bytesEncoder);
+    rmt_encoder_reset(_copyEncoder);
+    _state = State::SendRgbData;
     return ESP_OK;
 }
 

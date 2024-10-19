@@ -7,33 +7,33 @@ namespace esp32pp {
 constexpr auto TAG = "Task";
 
 Task::Task(Function func, std::string name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId)
-    : m_function(std::move(func))
-    , m_name(std::move(name))
+    : _function(std::move(func))
+    , _name(std::move(name))
 {
-    auto res = xTaskCreatePinnedToCore(&task_function, m_name.c_str(), stackSize, this, priority, &m_handle, coreId);
+    auto res = xTaskCreatePinnedToCore(&task_function, _name.c_str(), stackSize, this, priority, &_handle, coreId);
     if (res != pdPASS) {
-        ESP_LOGE(TAG, "Can not create task \"%s\": %d", m_name.c_str(), res);
+        ESP_LOGE(TAG, "Can not create task \"%s\": %d", _name.c_str(), res);
     }
 }
 
 TaskHandle_t Task::getNativeHandle() const
 {
-    return m_handle;
+    return _handle;
 }
 
 void Task::terminate()
 {
-    m_running = false;
+    _running = false;
 }
 
 void Task::suspend()
 {
-    vTaskSuspend(m_handle);
+    vTaskSuspend(_handle);
 }
 
 void Task::resumeFromISR()
 {
-    xTaskResumeFromISR(m_handle);
+    xTaskResumeFromISR(_handle);
 }
 
 void Task::task_function(void* instance)
@@ -43,20 +43,20 @@ void Task::task_function(void* instance)
 
 void Task::run()
 {
-    ESP_LOGI(TAG, ">> %s", m_name.c_str());
+    ESP_LOGI(TAG, ">> %s", _name.c_str());
 
-    m_running = true;
+    _running = true;
 
-    while (m_running) {
-        m_function();
+    while (_running) {
+        _function();
     }
 
-    if (m_handle != nullptr) {
-        vTaskDelete(m_handle);
-        m_handle = nullptr;
+    if (_handle != nullptr) {
+        vTaskDelete(_handle);
+        _handle = nullptr;
     }
 
-    ESP_LOGI(TAG, "<< %s", m_name.c_str());
+    ESP_LOGI(TAG, "<< %s", _name.c_str());
 }
 
 } // namespace esp32pp

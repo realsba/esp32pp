@@ -15,7 +15,7 @@ public:
     void sendMessage(const std::string& channelId, const std::string& message);
 
 private:
-    esp_http_client_handle_t m_httpClient;
+    esp_http_client_handle_t _httpClient;
 };
 
 } // namespace esp32pp

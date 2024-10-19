@@ -30,10 +30,10 @@ private:
     void run();
 
     // @formatter:off
-    Function                    m_function;
-    const std::string           m_name;
-    TaskHandle_t                m_handle {nullptr};
-    volatile bool               m_running {false};
+    Function                    _function;
+    const std::string           _name;
+    TaskHandle_t                _handle {nullptr};
+    volatile bool               _running {false};
     // @formatter:on
 };
 

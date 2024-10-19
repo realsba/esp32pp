@@ -15,10 +15,10 @@ private:
     void init();
 
     // @formatter:off
-    gpio_num_t                  m_pin;
-    uint32_t                    m_frequency;
-    uint8_t                     m_dutyCycle;
-    ledc_channel_config_t       m_ledcChannel {};
+    gpio_num_t                  _pin;
+    uint32_t                    _frequency;
+    uint8_t                     _dutyCycle;
+    ledc_channel_config_t       _ledcChannel {};
     // @formatter:on
 };
 

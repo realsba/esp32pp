@@ -26,13 +26,13 @@ private:
     void debounce();
 
     // @formatter:off
-    const gpio_num_t            m_gpio;
-    const std::string           m_name;
-    portMUX_TYPE                m_mux = portMUX_INITIALIZER_UNLOCKED;
-    Task                        m_task;
-    volatile uint32_t           m_debounceTimeout {0};
-    Handler                     m_onPressed;
-    Handler                     m_onReleased;
+    const gpio_num_t            _gpio;
+    const std::string           _name;
+    portMUX_TYPE                _mux = portMUX_INITIALIZER_UNLOCKED;
+    Task                        _task;
+    volatile uint32_t           _debounceTimeout {0};
+    Handler                     _onPressed;
+    Handler                     _onReleased;
     // @formatter:on
 };
 

@@ -12,7 +12,7 @@ public:
     ~CriticalSection();
 
 private:
-    portMUX_TYPE& m_mux;
+    portMUX_TYPE& _mux;
 };
 
 class CriticalSectionIsr {
@@ -21,7 +21,7 @@ public:
     ~CriticalSectionIsr();
 
 private:
-    portMUX_TYPE& m_mux;
+    portMUX_TYPE& _mux;
 };
 
 } // namespace esp32pp

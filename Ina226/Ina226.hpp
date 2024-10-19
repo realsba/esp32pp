@@ -40,12 +40,12 @@ public:
 
 private:
     // @formatter:off
-    I2CBus&                     m_bus;
-    uint16_t                    m_address;
-    i2c_master_dev_handle_t     m_handle {nullptr};
-    double                      m_shuntResistorValue {0.1};
-    double                      m_currentLSB {0};
-    double                      m_powerLSB {0};
+    I2CBus&                     _bus;
+    uint16_t                    _address;
+    i2c_master_dev_handle_t     _handle {nullptr};
+    double                      _shuntResistorValue {0.1};
+    double                      _currentLSB {0};
+    double                      _powerLSB {0};
     // @formatter:on
 };
 

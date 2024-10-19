@@ -17,11 +17,11 @@ private:
     void deinit();
 
     // @formatter:off
-    i2c_port_t                  m_port;
-    gpio_num_t                  m_sda;
-    gpio_num_t                  m_scl;
-    uint32_t                    m_freq;
-    i2c_master_bus_handle_t     m_busHandle {nullptr};
+    i2c_port_t                  _port;
+    gpio_num_t                  _sda;
+    gpio_num_t                  _scl;
+    uint32_t                    _freq;
+    i2c_master_bus_handle_t     _busHandle {nullptr};
     // @formatter:on
 };
 

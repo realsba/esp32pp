@@ -34,21 +34,21 @@ private:
 
 protected:
     // @formatter:off
-    std::error_code             m_status;
-    uint16_t                    m_startSignalDuration {1000};
-    uint8_t                     m_data[5] {};
+    std::error_code             _status;
+    uint16_t                    _startSignalDuration {1000};
+    uint8_t                     _data[5] {};
     // @formatter:on
 
 private:
     static uint32_t s_nextId;
 
     // @formatter:off
-    uint32_t                    m_id = s_nextId;
-    rmt_symbol_word_t           m_symbols[64] {};
-    Task                        m_task {[this] { readSensor(); }, "DHT:" + std::to_string(m_id)};
-    Handler                     m_handler;
-    rmt_channel_handle_t        m_channel {nullptr};
-    gpio_num_t                  m_pin {GPIO_NUM_0};
+    uint32_t                    _id = s_nextId;
+    rmt_symbol_word_t           _symbols[64] {};
+    Task                        _task {[this] { readSensor(); }, "DHT:" + std::to_string(_id)};
+    Handler                     _handler;
+    rmt_channel_handle_t        _channel {nullptr};
+    gpio_num_t                  _pin {GPIO_NUM_0};
     // @formatter:on
 };
 

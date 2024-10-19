@@ -34,16 +34,16 @@ private:
     void handleIpEvent(int32_t eventId);
     void scheduleReconnect();
 
-    asio::io_context& m_ioContext;
-    WorkGuard m_workGuard {m_ioContext.get_executor()};
-    asio::steady_timer m_retryTimer;
-    Handler m_onConnect;
-    Handler m_onStop;
-    std::string m_ssid;
-    std::string m_password;
-    esp_netif_t* m_netif {nullptr};
-    esp_event_handler_instance_t m_eventWiFi {nullptr};
-    esp_event_handler_instance_t m_eventIp {nullptr};
+    asio::io_context& _ioContext;
+    WorkGuard _workGuard {_ioContext.get_executor()};
+    asio::steady_timer _retryTimer;
+    Handler _onConnect;
+    Handler _onStop;
+    std::string _ssid;
+    std::string _password;
+    esp_netif_t* _netif {nullptr};
+    esp_event_handler_instance_t _eventWiFi {nullptr};
+    esp_event_handler_instance_t _eventIp {nullptr};
 };
 
 } // namespace esp32pp

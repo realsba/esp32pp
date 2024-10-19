@@ -32,12 +32,12 @@ private:
     esp_err_t reset();
 
     // @formatter:off
-    rmt_encoder_t               m_encoder {.encode = encode, .reset = reset, .del = nullptr};
-    rmt_channel_handle_t        m_channel {nullptr};
-    rmt_encoder_handle_t        m_bytesEncoder {nullptr};
-    rmt_encoder_handle_t        m_copyEncoder {nullptr};
-    rmt_symbol_word_t           m_resetCode {};
-    State                       m_state {State::SendData};
+    rmt_encoder_t               _encoder {.encode = encode, .reset = reset, .del = nullptr};
+    rmt_channel_handle_t        _channel {nullptr};
+    rmt_encoder_handle_t        _bytesEncoder {nullptr};
+    rmt_encoder_handle_t        _copyEncoder {nullptr};
+    rmt_symbol_word_t           _resetCode {};
+    State                       _state {State::SendData};
     // @formatter:on
 };
 

@@ -9,13 +9,13 @@ namespace esp32pp {
 using namespace std;
 
 Button::Button(gpio_num_t gpio, std::string name)
-    : m_gpio(gpio)
-    , m_name(std::move(name))
-    , m_task(std::bind_front(&Button::debounce, this), m_name)
+    : _gpio(gpio)
+    , _name(std::move(name))
+    , _task(std::bind_front(&Button::debounce, this), _name)
 {
     gpio_config_t io_conf {};
     io_conf.intr_type    = GPIO_INTR_ANYEDGE;
-    io_conf.pin_bit_mask = (1ULL << m_gpio);
+    io_conf.pin_bit_mask = (1ULL << _gpio);
     io_conf.mode         = GPIO_MODE_INPUT;
     io_conf.pull_up_en   = GPIO_PULLUP_ENABLE;
     io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
@@ -23,24 +23,24 @@ Button::Button(gpio_num_t gpio, std::string name)
 
     gpio_install_isr_service(0);
 
-    gpio_isr_handler_add(m_gpio, gpio_interrupt_handler, this);
+    gpio_isr_handler_add(_gpio, gpio_interrupt_handler, this);
 
-    m_task.suspend();
+    _task.suspend();
 }
 
 Button::~Button()
 {
-    m_task.terminate();
+    _task.terminate();
 }
 
 void Button::setPressedHandler(Button::Handler&& handler)
 {
-    m_onPressed = std::move(handler);
+    _onPressed = std::move(handler);
 }
 
 void Button::setReleasedHandler(Button::Handler&& handler)
 {
-    m_onReleased = std::move(handler);
+    _onReleased = std::move(handler);
 }
 
 void IRAM_ATTR Button::gpio_interrupt_handler(void* arg)
@@ -50,9 +50,9 @@ void IRAM_ATTR Button::gpio_interrupt_handler(void* arg)
 
 void IRAM_ATTR Button::handleInterrupt()
 {
-    CriticalSectionIsr cs(m_mux);
-    m_debounceTimeout = xTaskGetTickCountFromISR() + pdMS_TO_TICKS(10);
-    m_task.resumeFromISR();
+    CriticalSectionIsr cs(_mux);
+    _debounceTimeout = xTaskGetTickCountFromISR() + pdMS_TO_TICKS(10);
+    _task.resumeFromISR();
 }
 
 void Button::debounce()
@@ -61,18 +61,18 @@ void Button::debounce()
         uint32_t debounceTimeout;
 
         {
-            CriticalSection cs(m_mux);
-            debounceTimeout = m_debounceTimeout;
+            CriticalSection cs(_mux);
+            debounceTimeout = _debounceTimeout;
         }
 
         if (xTaskGetTickCount() >= debounceTimeout) {
-            if (gpio_get_level(m_gpio)) {
-                if (m_onReleased) {
-                    m_onReleased();
+            if (gpio_get_level(_gpio)) {
+                if (_onReleased) {
+                    _onReleased();
                 }
             } else {
-                if (m_onPressed) {
-                    m_onPressed();
+                if (_onPressed) {
+                    _onPressed();
                 }
             }
             break;
@@ -81,7 +81,7 @@ void Button::debounce()
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 
-    m_task.suspend();
+    _task.suspend();
 }
 
 } // namespace esp32pp

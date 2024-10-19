@@ -15,14 +15,14 @@ uint32_t DHT::s_nextId {0};
 
 DHT::~DHT()
 {
-    if (m_channel) {
-        rmt_del_channel(m_channel);
+    if (_channel) {
+        rmt_del_channel(_channel);
     }
 }
 
 void DHT::setup(gpio_num_t gpio, uint32_t clockResolution)
 {
-    m_pin = gpio;
+    _pin = gpio;
 
     ESP_LOGI(TAG, "Create RMT RX channel");
     rmt_rx_channel_config_t channelConfig = {
@@ -38,17 +38,17 @@ void DHT::setup(gpio_num_t gpio, uint32_t clockResolution)
             .allow_pd = true
         }
     };
-    ESP_ERROR_CHECK(rmt_new_rx_channel(&channelConfig, &m_channel));
+    ESP_ERROR_CHECK(rmt_new_rx_channel(&channelConfig, &_channel));
 
     ESP_LOGI(TAG, "Register RX done callback");
     rmt_rx_event_callbacks_t cbs = {
         .on_recv_done = rx_done_callback,
     };
 
-    ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(m_channel, &cbs, m_task.getNativeHandle()));
+    ESP_ERROR_CHECK(rmt_rx_register_event_callbacks(_channel, &cbs, _task.getNativeHandle()));
 
-    gpio_set_direction(m_pin, GPIO_MODE_OUTPUT);
-    gpio_set_level(m_pin, 1);
+    gpio_set_direction(_pin, GPIO_MODE_OUTPUT);
+    gpio_set_level(_pin, 1);
 }
 
 void DHT::read(Handler&& handler)
@@ -59,15 +59,15 @@ void DHT::read(Handler&& handler)
         .flags = {.en_partial_rx = 0}
     };
 
-    m_handler = std::move(handler);
-    m_status  = std::error_code();
+    _handler = std::move(handler);
+    _status  = std::error_code();
 
-    gpio_set_direction(m_pin, GPIO_MODE_OUTPUT);
-    gpio_set_level(m_pin, 0);
-    esp_rom_delay_us(m_startSignalDuration);
-    rmt_enable(m_channel);
-    ESP_ERROR_CHECK(rmt_receive(m_channel, m_symbols, sizeof(m_symbols), &config));
-    gpio_set_direction(m_pin, GPIO_MODE_INPUT);
+    gpio_set_direction(_pin, GPIO_MODE_OUTPUT);
+    gpio_set_level(_pin, 0);
+    esp_rom_delay_us(_startSignalDuration);
+    rmt_enable(_channel);
+    ESP_ERROR_CHECK(rmt_receive(_channel, _symbols, sizeof(_symbols), &config));
+    gpio_set_direction(_pin, GPIO_MODE_INPUT);
 }
 
 bool IRAM_ATTR DHT::rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t* eventData,
@@ -88,24 +88,24 @@ void DHT::readSensor()
 
         decode(eventData->received_symbols, eventData->num_symbols);
 
-        rmt_disable(m_channel);
-        gpio_set_direction(m_pin, GPIO_MODE_OUTPUT);
-        gpio_set_level(m_pin, 1);
+        rmt_disable(_channel);
+        gpio_set_direction(_pin, GPIO_MODE_OUTPUT);
+        gpio_set_level(_pin, 1);
 
-        if (m_handler) {
-            m_handler(m_status, humidity(), temperature());
+        if (_handler) {
+            _handler(_status, humidity(), temperature());
         }
     }
 }
 
 void DHT::decode(rmt_symbol_word_t* data, size_t numItems)
 {
-    m_data[0] = 0;
-    m_data[1] = 0;
-    m_data[2] = 0;
-    m_data[3] = 0;
-    m_data[4] = 0;
-    m_status  = error::DhtCategory::BadResponse;
+    _data[0] = 0;
+    _data[1] = 0;
+    _data[2] = 0;
+    _data[3] = 0;
+    _data[4] = 0;
+    _status  = error::DhtCategory::BadResponse;
 
     if (numItems < 42) {
         ESP_LOGD(TAG, "Incorrect pulse count: %u", numItems);
@@ -137,49 +137,49 @@ void DHT::decode(rmt_symbol_word_t* data, size_t numItems)
             ESP_LOGE(TAG, "Incorrect duration0. item: %d, duration: %u", i, duration);
             return;
         }
-        m_data[(i - 1) / 8] <<= 1;
+        _data[(i - 1) / 8] <<= 1;
         duration = ptr[i].duration1;
         if (duration >= 68 && duration <= 75) {
-            m_data[(i - 1) / 8] |= 1;
+            _data[(i - 1) / 8] |= 1;
         } else if (duration < 22 || duration > 30) {
             ESP_LOGE(TAG, "Incorrect duration1. item: %d, duration: %u", i, duration);
             return;
         }
     }
 
-    if (m_data[4] == ((m_data[0] + m_data[1] + m_data[2] + m_data[3]) & 0xFF)) {
-        m_status = std::error_code();
+    if (_data[4] == ((_data[0] + _data[1] + _data[2] + _data[3]) & 0xFF)) {
+        _status = std::error_code();
     }
 }
 
 DHT11::DHT11()
 {
-    m_startSignalDuration = 30000;
+    _startSignalDuration = 30000;
 }
 
 float DHT11::temperature()
 {
-    if (m_status) {
+    if (_status) {
         return std::numeric_limits<float>::quiet_NaN();
     }
-    return m_data[2];
+    return _data[2];
 }
 
 float DHT11::humidity()
 {
-    if (m_status) {
+    if (_status) {
         return std::numeric_limits<float>::quiet_NaN();
     }
-    return m_data[0];
+    return _data[0];
 }
 
 float DHT22::temperature()
 {
-    if (m_status) {
+    if (_status) {
         return std::numeric_limits<float>::quiet_NaN();
     }
-    auto temp = static_cast<float>((((m_data[2] & 0x7F) << 8) | m_data[3]) * 0.1);
-    if (m_data[2] & 0x80) {
+    auto temp = static_cast<float>((((_data[2] & 0x7F) << 8) | _data[3]) * 0.1);
+    if (_data[2] & 0x80) {
         temp = -temp;
     }
     return temp;
@@ -187,10 +187,10 @@ float DHT22::temperature()
 
 float DHT22::humidity()
 {
-    if (m_status) {
+    if (_status) {
         return std::numeric_limits<float>::quiet_NaN();
     }
-    return static_cast<float>(((m_data[0] << 8) | m_data[1]) * 0.1);
+    return static_cast<float>(((_data[0] << 8) | _data[1]) * 0.1);
 }
 
 namespace error::detail {
