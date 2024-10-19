@@ -35,7 +35,7 @@ void DHT::setup(gpio_num_t gpio, uint32_t clockResolution)
             .invert_in = false,
             .with_dma = false,
             .io_loop_back = false,
-            .backup_before_sleep = true
+            .allow_pd = true
         }
     };
     ESP_ERROR_CHECK(rmt_new_rx_channel(&channelConfig, &m_channel));

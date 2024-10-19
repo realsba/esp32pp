@@ -35,7 +35,7 @@ void LedStrip::setup(uint8_t gpio, const LedStripConfig& config)
             .with_dma = false,
             .io_loop_back = false,
             .io_od_mode = false,
-            .backup_before_sleep = false
+            .allow_pd = false
         }
     };
     ESP_ERROR_CHECK(rmt_new_tx_channel(&channelConfig, &m_channel));

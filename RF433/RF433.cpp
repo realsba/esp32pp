@@ -26,7 +26,7 @@ void RF433::setup(uint8_t gpio)
             .with_dma = false,
             .io_loop_back = false,
             .io_od_mode = false,
-            .backup_before_sleep = true
+            .allow_pd = true
         }
     };
     ESP_ERROR_CHECK(rmt_new_tx_channel(&channelConfig, &m_channel));
