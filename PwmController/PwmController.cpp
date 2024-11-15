@@ -13,8 +13,8 @@ PwmController::PwmController(gpio_num_t pin, uint32_t frequency, uint32_t dutyCy
 void PwmController::setDutyCycle(uint32_t value)
 {
     _dutyCycle = value;
-    ledc_set_duty(LEDC_HIGH_SPEED_MODE, _ledcChannel.channel, _dutyCycle);
-    ledc_update_duty(LEDC_HIGH_SPEED_MODE, _ledcChannel.channel);
+    ledc_set_duty(LEDC_HIGH_SPEED_MODE, _ledcChannelConfig.channel, _dutyCycle);
+    ledc_update_duty(LEDC_HIGH_SPEED_MODE, _ledcChannelConfig.channel);
 }
 
 void PwmController::init()
@@ -29,7 +29,7 @@ void PwmController::init()
     };
     ledc_timer_config(&timerConfig);
 
-    _ledcChannel = {
+    _ledcChannelConfig = {
         .gpio_num = _pin,
         .speed_mode = LEDC_HIGH_SPEED_MODE,
         .channel = LEDC_CHANNEL_0,
@@ -37,11 +37,12 @@ void PwmController::init()
         .timer_sel = LEDC_TIMER_0,
         .duty = _dutyCycle,
         .hpoint = 0,
+        .sleep_mode = LEDC_SLEEP_MODE_NO_ALIVE_NO_PD,
         .flags = {.output_invert = false}
     };
-    ledc_channel_config(&_ledcChannel);
-    ledc_set_duty(LEDC_HIGH_SPEED_MODE, _ledcChannel.channel, _dutyCycle);
-    ledc_update_duty(LEDC_HIGH_SPEED_MODE, _ledcChannel.channel);
+    ledc_channel_config(&_ledcChannelConfig);
+    ledc_set_duty(LEDC_HIGH_SPEED_MODE, _ledcChannelConfig.channel, _dutyCycle);
+    ledc_update_duty(LEDC_HIGH_SPEED_MODE, _ledcChannelConfig.channel);
 }
 
 } // namespace esp32pp

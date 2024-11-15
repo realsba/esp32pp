@@ -18,7 +18,7 @@ private:
     gpio_num_t                  _pin;
     uint32_t                    _frequency;
     uint8_t                     _dutyCycle;
-    ledc_channel_config_t       _ledcChannel {};
+    ledc_channel_config_t       _ledcChannelConfig {};
     // @formatter:on
 };
 

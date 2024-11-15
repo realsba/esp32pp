@@ -34,7 +34,7 @@ esp_err_t I2CBus::addDevice(uint16_t address, i2c_master_dev_handle_t* deviceHan
 
 void I2CBus::init()
 {
-    i2c_master_bus_config_t bus_config = {
+    i2c_master_bus_config_t busConfig = {
         .i2c_port = _port,
         .sda_io_num = _sda,
         .scl_io_num = _scl,
@@ -42,10 +42,10 @@ void I2CBus::init()
         .glitch_ignore_cnt = 7,
         .intr_priority = 0,
         .trans_queue_depth = 0,
-        .flags = {.enable_internal_pullup = false},
+        .flags = {.enable_internal_pullup = false, .allow_pd = true},
     };
 
-    esp_err_t err = i2c_new_master_bus(&bus_config, &_busHandle);
+    esp_err_t err = i2c_new_master_bus(&busConfig, &_busHandle);
     if (err != ESP_OK) {
         ESP_LOGE("I2CBus", "Failed to initialize I2C: %s", esp_err_to_name(err));
     }
