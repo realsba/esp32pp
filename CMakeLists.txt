@@ -18,6 +18,7 @@ set(EXTRA_COMPONENT_DIRS
     LedStrip
     PwmController
     RF433
+    TM1637
     Task
     TelegramBot
     Timer
