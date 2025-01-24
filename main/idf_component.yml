@@ -1,6 +1,5 @@
 ## IDF Component Manager Manifest File
 dependencies:
-  espressif/asio: "^1.28.2"
-  ## Required IDF version
+  espressif/asio: "1.28.2"
   idf:
-    version: "^5.4.0"
+    version: "5.4.0"

@@ -32,31 +32,39 @@ WiFiStation::~WiFiStation()
     esp_netif_destroy_default_wifi(_netif);
 }
 
-void WiFiStation::setSSID(const std::string& ssid)
+std::string WiFiStation::getSSID() const
 {
-    _ssid = ssid;
+    wifi_config_t wifiConfig = {};
+
+    ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &wifiConfig));
+
+    auto* ssid = reinterpret_cast<char*>(wifiConfig.sta.ssid);
+
+    return {ssid, strnlen(ssid, sizeof(wifiConfig.sta.ssid))};
 }
 
-void WiFiStation::setPassword(const std::string& password)
+void WiFiStation::setConfig(const std::string& ssid, const std::string& password)
 {
-    _password = password;
+    wifi_config_t wifiConfig = {};
+
+    ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &wifiConfig));
+
+    auto n = ssid.copy(reinterpret_cast<char*>(wifiConfig.sta.ssid), sizeof(wifiConfig.sta.ssid) - 1);
+    wifiConfig.sta.ssid[n] = 0;
+    n = password.copy(reinterpret_cast<char*>(wifiConfig.sta.password), sizeof(wifiConfig.sta.password) - 1);
+    wifiConfig.sta.password[n] = 0;
+    wifiConfig.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+    wifiConfig.sta.pmf_cfg.capable = true;
+    wifiConfig.sta.pmf_cfg.required = false;
+
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifiConfig));
 }
 
 void WiFiStation::start()
 {
     ESP_LOGI(TAG, "Starting Wi-Fi station...");
 
-    wifi_config_t wifiConfig = {};
-    auto n = _ssid.copy(reinterpret_cast<char*>(wifiConfig.sta.ssid), sizeof(wifiConfig.sta.ssid) - 1);
-    wifiConfig.sta.ssid[n] = 0;
-    n = _password.copy(reinterpret_cast<char*>(wifiConfig.sta.password), sizeof(wifiConfig.sta.password) - 1);
-    wifiConfig.sta.password[n] = 0;
-    wifiConfig.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
-    wifiConfig.sta.pmf_cfg.capable = true;
-    wifiConfig.sta.pmf_cfg.required = false;
-
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifiConfig));
     ESP_ERROR_CHECK(esp_wifi_start());
 }
 
@@ -69,13 +77,13 @@ void WiFiStation::stop()
 void WiFiStation::wifiEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData)
 {
     auto self = static_cast<WiFiStation*>(arg)->shared_from_this();
-    self->_ioContext.post([=] { self->handleWiFiEvent(eventId); });
+    asio::post(self->_ioContext, [=] { self->handleWiFiEvent(eventId); });
 }
 
 void WiFiStation::ipEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData)
 {
     const auto self = static_cast<WiFiStation*>(arg)->shared_from_this();
-    self->_ioContext.post([=] { self->handleIpEvent(eventId); });
+    asio::post(self->_ioContext, [=] { self->handleIpEvent(eventId); });
 }
 
 void WiFiStation::handleWiFiEvent(int32_t eventId)
