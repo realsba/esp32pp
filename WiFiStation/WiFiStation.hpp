@@ -14,12 +14,15 @@ class WiFiStation : public std::enable_shared_from_this<WiFiStation> {
 public:
     using Handler = std::function<void()>;
 
-    explicit WiFiStation(asio::io_context& ioContext, Handler&& onConnect, Handler&& onStop);
+    explicit WiFiStation(asio::io_context& ioContext);
     ~WiFiStation();
 
     std::string getSSID() const;
 
     void setConfig(const std::string& ssid, const std::string& password);
+    void setOnConnect(Handler&& handler);
+    void setOnReconnecting(Handler&& handler);
+    void setOnStop(Handler&& handler);
 
     void start();
     void stop();
@@ -33,12 +36,12 @@ private:
     void handleWiFiEvent(int32_t eventId);
     void handleIpEvent(int32_t eventId);
     void scheduleReconnect();
-    void updateConfig();
 
     asio::io_context& _ioContext;
     WorkGuard _workGuard {_ioContext.get_executor()};
     asio::steady_timer _retryTimer;
     Handler _onConnect;
+    Handler _onReconnecting;
     Handler _onStop;
     esp_netif_t* _netif {nullptr};
     esp_event_handler_instance_t _eventWiFi {nullptr};

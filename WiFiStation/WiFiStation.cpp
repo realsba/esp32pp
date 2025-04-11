@@ -6,11 +6,9 @@ namespace esp32pp {
 
 constexpr auto TAG = "WiFiStation";
 
-WiFiStation::WiFiStation(asio::io_context& ioContext, Handler&& onConnect, Handler&& onStop)
+WiFiStation::WiFiStation(asio::io_context& ioContext)
     : _ioContext(ioContext)
     , _retryTimer(ioContext)
-    , _onConnect(std::move(onConnect))
-    , _onStop(std::move(onStop))
 {
     _netif                 = esp_netif_create_default_wifi_sta();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -60,6 +58,21 @@ void WiFiStation::setConfig(const std::string& ssid, const std::string& password
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifiConfig));
 }
 
+void WiFiStation::setOnConnect(Handler&& handler)
+{
+    _onConnect = std::move(handler);
+}
+
+void WiFiStation::setOnReconnecting(Handler&& handler)
+{
+    _onReconnecting = std::move(handler);
+}
+
+void WiFiStation::setOnStop(Handler&& handler)
+{
+    _onStop = std::move(handler);
+}
+
 void WiFiStation::start()
 {
     ESP_LOGI(TAG, "Starting Wi-Fi station...");
@@ -96,6 +109,9 @@ void WiFiStation::handleWiFiEvent(int32_t eventId)
         }
     } else if (eventId == WIFI_EVENT_STA_DISCONNECTED) {
         ESP_LOGW(TAG, "Wi-Fi Disconnected. Scheduling reconnect...");
+        if (_onReconnecting) {
+            _onReconnecting();
+        }
         scheduleReconnect();
     }
 }
