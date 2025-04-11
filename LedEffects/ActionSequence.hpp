@@ -34,6 +34,7 @@ public:
     void setOnComplete(std::function<void()> callback);
 
     void start();
+    void stop();
 
 private:
     void executeNextAction();

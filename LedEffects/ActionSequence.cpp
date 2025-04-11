@@ -40,6 +40,7 @@ void ActionSequence::setOnComplete(std::function<void()> callback)
     _onComplete = std::move(callback);
 }
 
+// TODO: make it thread-safe
 void ActionSequence::start()
 {
     if (_actions.empty() && _repeatCount == 0 && _repeatDuration.count() == 0) {
@@ -53,6 +54,12 @@ void ActionSequence::start()
     _currentActionIndex = 0;
     _startTime          = std::chrono::steady_clock::now();
     executeNextAction();
+}
+
+// TODO: make it thread-safe
+void ActionSequence::stop()
+{
+    _timer.cancel();
 }
 
 void ActionSequence::executeNextAction()
@@ -84,10 +91,12 @@ void ActionSequence::executeNextAction()
 
     _timer.expires_after(duration);
     _timer.async_wait(
-        [this](const asio::error_code&)
+        [this](const asio::error_code& ec)
         {
-            ++_currentActionIndex;
-            executeNextAction();
+            if (!ec) {
+                ++_currentActionIndex;
+                executeNextAction();
+            }
         }
     );
 }
