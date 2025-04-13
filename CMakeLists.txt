@@ -25,6 +25,8 @@ set(EXTRA_COMPONENT_DIRS
     WiFiStation
 )
 
+add_compile_definitions(ASIO_NO_DEPRECATED)
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 project(esp32pp)

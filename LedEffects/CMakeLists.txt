@@ -3,5 +3,5 @@ idf_component_register(
         "ActionSequence.cpp"
         "LedController.cpp"
     INCLUDE_DIRS .
-    REQUIRES driver asio esp_driver_ledc
+    REQUIRES driver esp_driver_ledc asio sock_utils
 )
