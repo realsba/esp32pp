@@ -1,3 +1,6 @@
+// file   : LedController.cpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
 #include "LedController.hpp"
 
 #include <cmath>

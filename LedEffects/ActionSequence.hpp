@@ -1,27 +1,25 @@
-#ifndef ESP32PP_ACTIONSEQUENCE_HPP
-#define ESP32PP_ACTIONSEQUENCE_HPP
+// file   : ActionSequence.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
+
+#include "RepeatStrategy.hpp"
 
 #include <asio.hpp>
-#include <vector>
-#include <functional>
+
 #include <chrono>
+#include <functional>
+#include <memory>
 #include <utility>
-#include <cstddef>
+#include <vector>
 
 namespace esp32pp {
 
 class ActionSequence {
 public:
-    enum class RepeatMode {
-        None,
-        Count,
-        Duration,
-        Infinite
-    };
-
     using Action = std::pair<std::function<void()>, std::chrono::milliseconds>;
 
-    explicit ActionSequence(asio::io_context& ioc);
+    explicit ActionSequence(asio::any_io_executor executor);
 
     template <typename Func>
     void addAction(Func&& action, std::chrono::milliseconds duration);
@@ -38,17 +36,15 @@ public:
 
 private:
     void executeNextAction();
+    void complete();
 
+    asio::any_io_executor _executor;
     asio::steady_timer _timer;
     std::function<void()> _onComplete;
     std::vector<Action> _actions;
+    RepeatStrategyPtr _repeatStrategy {std::make_unique<RepeatNone>()};
     size_t _currentActionIndex {0};
-
-    std::chrono::milliseconds _repeatDuration {0};
-    std::chrono::steady_clock::time_point _startTime;
-    RepeatMode _repeatMode {RepeatMode::None};
-    uint32_t _repeatCount {0};
-    uint32_t _executedRepeats {0};
+    bool _running {false};
 };
 
 template <typename Func>
@@ -58,5 +54,3 @@ void ActionSequence::addAction(Func&& action, std::chrono::milliseconds duration
 }
 
 } // namespace esp32pp
-
-#endif // ESP32PP_ACTIONSEQUENCE_HPP

@@ -1,5 +1,7 @@
-#ifndef ESP32PP_LEDCONTROLLER_HPP
-#define ESP32PP_LEDCONTROLLER_HPP
+// file   : LedController.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <driver/ledc.h>
 
@@ -29,7 +31,4 @@ private:
     bool _isOn {false};
 };
 
-
 } // namespace esp32pp
-
-#endif // ESP32PP_LEDCONTROLLER_HPP

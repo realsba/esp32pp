@@ -1,38 +1,33 @@
+// file   : ActionSequence.cpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
 #include "ActionSequence.hpp"
 
 namespace esp32pp {
 
-ActionSequence::ActionSequence(asio::io_context& ioc)
-    : _timer(ioc)
-{
-}
+ActionSequence::ActionSequence(asio::any_io_executor executor)
+    : _executor(std::move(executor))
+    , _timer(_executor)
+{}
 
 void ActionSequence::setNoRepeat()
 {
-    _repeatMode     = RepeatMode::None;
-    _repeatCount    = 0;
-    _repeatDuration = std::chrono::milliseconds(0);
+    _repeatStrategy = std::make_unique<RepeatNone>();
 }
 
 void ActionSequence::setRepeatCount(uint32_t count)
 {
-    _repeatMode     = RepeatMode::Count;
-    _repeatCount    = count;
-    _repeatDuration = std::chrono::milliseconds(0);
+    _repeatStrategy = std::make_unique<RepeatCount>(count);
 }
 
 void ActionSequence::setRepeatDuration(std::chrono::milliseconds duration)
 {
-    _repeatMode     = RepeatMode::Duration;
-    _repeatDuration = duration;
-    _repeatCount    = 0;
+    _repeatStrategy = std::make_unique<RepeatDuration>(duration);
 }
 
 void ActionSequence::setInfiniteRepeat()
 {
-    _repeatMode     = RepeatMode::Infinite;
-    _repeatCount    = 0;
-    _repeatDuration = std::chrono::milliseconds(0);
+    _repeatStrategy = std::make_unique<RepeatInfinite>();
 }
 
 void ActionSequence::setOnComplete(std::function<void()> callback)
@@ -40,50 +35,44 @@ void ActionSequence::setOnComplete(std::function<void()> callback)
     _onComplete = std::move(callback);
 }
 
-// TODO: make it thread-safe
 void ActionSequence::start()
 {
-    if (_actions.empty() && _repeatCount == 0 && _repeatDuration.count() == 0) {
-        if (_onComplete) {
-            _onComplete();
-        }
-        return;
-    }
+    asio::post(_executor, [this] {
+        if (_running) return;
 
-    _executedRepeats    = 0;
-    _currentActionIndex = 0;
-    _startTime          = std::chrono::steady_clock::now();
-    executeNextAction();
+        if (_actions.empty()) {
+            complete();
+            return;
+        }
+
+        _running = true;
+        _currentActionIndex = 0;
+        _repeatStrategy->reset();
+
+        executeNextAction();
+    });
 }
 
-// TODO: make it thread-safe
 void ActionSequence::stop()
 {
-    _timer.cancel();
+    asio::post(_executor, [this] {
+        _running = false;
+        _timer.cancel();
+    });
 }
 
 void ActionSequence::executeNextAction()
 {
+    if (!_running) return;
+
     if (_currentActionIndex >= _actions.size()) {
-        _currentActionIndex = 0;
-
-        if (_repeatMode == RepeatMode::Count) {
-            if (++_executedRepeats >= _repeatCount) {
-                if (_onComplete) {
-                    _onComplete();
-                }
-                return;
-            }
-        } else if (_repeatMode == RepeatMode::Duration) {
-            auto elapsed = std::chrono::steady_clock::now() - _startTime;
-            if (elapsed >= _repeatDuration) {
-                if (_onComplete) {
-                    _onComplete();
-                }
-                return;
-            }
+        if (_repeatStrategy->shouldRepeat(_actions.size())) {
+            _currentActionIndex = 0;
+        } else {
+            _running = false;
+            complete();
+            return;
         }
-
     }
 
     auto& [action, duration] = _actions[_currentActionIndex];
@@ -91,14 +80,20 @@ void ActionSequence::executeNextAction()
 
     _timer.expires_after(duration);
     _timer.async_wait(
-        [this](const asio::error_code& ec)
-        {
+        [this](const asio::error_code& ec) {
             if (!ec) {
                 ++_currentActionIndex;
                 executeNextAction();
             }
         }
     );
+}
+
+void ActionSequence::complete()
+{
+    if (_onComplete) {
+        asio::post(_executor, _onComplete);
+    }
 }
 
 } // namespace esp32pp
