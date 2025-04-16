@@ -1,0 +1,7 @@
+dependencies:
+  DHT:
+    version: ^1.0.0
+    override_path: "../../../../components/DHT"
+  Task:
+    version: ^1.0.0
+    override_path: "../../../../components/Task"

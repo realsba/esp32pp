@@ -85,8 +85,8 @@ extern "C" void app_main()
     asio::io_context ioc;
     ledStrip.setup(5, WS2812Config {});
 
-    ActionSequence actions(ioc);
-    ActionSequence fade(ioc);
+    ActionSequence actions(ioc.get_executor());
+    ActionSequence fade(ioc.get_executor());
 
     int pixelIndex1 = 0;
     int pixelIndex2 = PIXELS_SIZE / 2;

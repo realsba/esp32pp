@@ -1,0 +1,4 @@
+dependencies:
+  TM1637:
+    version: ^1.0.0
+    override_path: "../../../components/TM1637"

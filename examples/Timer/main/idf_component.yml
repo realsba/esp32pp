@@ -1,0 +1,4 @@
+dependencies:
+  Timer:
+    version: ^1.0.0
+    override_path: "../../../components/Timer"

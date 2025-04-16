@@ -2,3 +2,33 @@
 dependencies:
   idf: ^5.4.0
   espressif/asio: 1.32.0
+  Button:
+    override_path: ../components/Button
+  CriticalSection:
+    override_path: ../components/CriticalSection
+  DHT:
+    override_path: ../components/DHT
+  HttpServer:
+    override_path: ../components/HttpServer
+  I2C:
+    override_path: ../components/I2C
+  Ina226:
+    override_path: ../components/Ina226
+  LedEffects:
+    override_path: ../components/LedEffects
+  LedStrip:
+    override_path: ../components/LedStrip
+  PwmController:
+    override_path: ../components/PwmController
+  RF433:
+    override_path: ../components/RF433
+  Task:
+    override_path: ../components/Task
+  TelegramBot:
+    override_path: ../components/TelegramBot
+  Timer:
+    override_path: ../components/Timer
+  TM1637:
+    override_path: ../components/TM1637
+  WiFiStation:
+    override_path: ../components/WiFiStation

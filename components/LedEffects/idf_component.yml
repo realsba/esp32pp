@@ -1,0 +1,4 @@
+version: 1.0.0
+dependencies:
+  idf: ^5.4.0
+  espressif/asio: 1.32.0
