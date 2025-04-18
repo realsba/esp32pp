@@ -1,4 +1,4 @@
-// file   : WiFiStation.hpp
+// file   : WiFiManager.hpp
 // author : sba <bohdan.sadovyak@gmail.com>
 
 #pragma once
@@ -12,12 +12,12 @@
 
 namespace esp32pp {
 
-class WiFiStation : public std::enable_shared_from_this<WiFiStation> {
+class WiFiManager : public std::enable_shared_from_this<WiFiManager> {
 public:
     using Handler = std::function<void()>;
 
-    explicit WiFiStation(asio::io_context& ioContext);
-    ~WiFiStation();
+    explicit WiFiManager(asio::any_io_executor executor);
+    ~WiFiManager();
 
     std::string getSSID() const;
 
@@ -30,7 +30,7 @@ public:
     void stop();
 
 private:
-    using WorkGuard = asio::executor_work_guard<asio::io_context::executor_type>;
+    using WorkGuard = asio::executor_work_guard<asio::any_io_executor>;
 
     static void wifiEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData);
     static void ipEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData);
@@ -39,8 +39,8 @@ private:
     void handleIpEvent(int32_t eventId);
     void scheduleReconnect();
 
-    asio::io_context& _ioContext;
-    WorkGuard _workGuard{_ioContext.get_executor()};
+    asio::any_io_executor _executor;
+    WorkGuard _workGuard;
     asio::steady_timer _retryTimer;
     Handler _onConnect;
     Handler _onReconnecting;

@@ -30,5 +30,5 @@ dependencies:
     override_path: ../components/Timer
   TM1637:
     override_path: ../components/TM1637
-  WiFiStation:
-    override_path: ../components/WiFiStation
+  WiFiManager:
+    override_path: ../components/WiFiManager

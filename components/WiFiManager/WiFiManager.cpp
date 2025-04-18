@@ -1,30 +1,31 @@
-// file   : WiFiStation.cpp
+// file   : WiFiManager.cpp
 // author : sba <bohdan.sadovyak@gmail.com>
 
-#include "WiFiStation.hpp"
+#include "WiFiManager.hpp"
 
 #include <esp_log.h>
 
 namespace esp32pp {
 
-constexpr auto TAG = "WiFiStation";
+constexpr auto TAG = "WiFiManager";
 
-WiFiStation::WiFiStation(asio::io_context& ioContext)
-    : _ioContext(ioContext)
-    , _retryTimer(ioContext)
+WiFiManager::WiFiManager(asio::any_io_executor executor)
+    : _executor(std::move(executor))
+    , _workGuard(_executor)
+    , _retryTimer(_executor)
 {
     _netif = esp_netif_create_default_wifi_sta();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        WIFI_EVENT, ESP_EVENT_ANY_ID, &WiFiStation::wifiEventHandler, this, &_eventWiFi
+        WIFI_EVENT, ESP_EVENT_ANY_ID, &WiFiManager::wifiEventHandler, this, &_eventWiFi
     ));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        IP_EVENT, IP_EVENT_STA_GOT_IP, &WiFiStation::ipEventHandler, this, &_eventIp
+        IP_EVENT, IP_EVENT_STA_GOT_IP, &WiFiManager::ipEventHandler, this, &_eventIp
     ));
 }
 
-WiFiStation::~WiFiStation()
+WiFiManager::~WiFiManager()
 {
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, _eventIp));
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, _eventWiFi));
@@ -33,7 +34,7 @@ WiFiStation::~WiFiStation()
     esp_netif_destroy_default_wifi(_netif);
 }
 
-std::string WiFiStation::getSSID() const
+std::string WiFiManager::getSSID() const
 {
     wifi_config_t wifiConfig = {};
 
@@ -44,7 +45,7 @@ std::string WiFiStation::getSSID() const
     return {ssid, strnlen(ssid, sizeof(wifiConfig.sta.ssid))};
 }
 
-void WiFiStation::setConfig(const std::string& ssid, const std::string& password)
+void WiFiManager::setConfig(const std::string& ssid, const std::string& password)
 {
     wifi_config_t wifiConfig = {};
 
@@ -61,22 +62,22 @@ void WiFiStation::setConfig(const std::string& ssid, const std::string& password
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifiConfig));
 }
 
-void WiFiStation::setOnConnect(Handler&& handler)
+void WiFiManager::setOnConnect(Handler&& handler)
 {
     _onConnect = std::move(handler);
 }
 
-void WiFiStation::setOnReconnecting(Handler&& handler)
+void WiFiManager::setOnReconnecting(Handler&& handler)
 {
     _onReconnecting = std::move(handler);
 }
 
-void WiFiStation::setOnStop(Handler&& handler)
+void WiFiManager::setOnStop(Handler&& handler)
 {
     _onStop = std::move(handler);
 }
 
-void WiFiStation::start()
+void WiFiManager::start()
 {
     ESP_LOGI(TAG, "Starting Wi-Fi station...");
 
@@ -84,25 +85,25 @@ void WiFiStation::start()
     ESP_ERROR_CHECK(esp_wifi_start());
 }
 
-void WiFiStation::stop()
+void WiFiManager::stop()
 {
     ESP_LOGI(TAG, "Stopping Wi-Fi station...");
     esp_wifi_stop();
 }
 
-void WiFiStation::wifiEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData)
+void WiFiManager::wifiEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData)
 {
-    auto self = static_cast<WiFiStation*>(arg)->shared_from_this();
-    asio::post(self->_ioContext, [=] { self->handleWiFiEvent(eventId); });
+    auto self = static_cast<WiFiManager*>(arg)->shared_from_this();
+    asio::post(self->_executor, [=] { self->handleWiFiEvent(eventId); });
 }
 
-void WiFiStation::ipEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData)
+void WiFiManager::ipEventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData)
 {
-    const auto self = static_cast<WiFiStation*>(arg)->shared_from_this();
-    asio::post(self->_ioContext, [=] { self->handleIpEvent(eventId); });
+    const auto self = static_cast<WiFiManager*>(arg)->shared_from_this();
+    asio::post(self->_executor, [=] { self->handleIpEvent(eventId); });
 }
 
-void WiFiStation::handleWiFiEvent(int32_t eventId)
+void WiFiManager::handleWiFiEvent(int32_t eventId)
 {
     if (eventId == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
@@ -119,7 +120,7 @@ void WiFiStation::handleWiFiEvent(int32_t eventId)
     }
 }
 
-void WiFiStation::handleIpEvent(int32_t eventId)
+void WiFiManager::handleIpEvent(int32_t eventId)
 {
     if (eventId == IP_EVENT_STA_GOT_IP) {
         // auto* event = static_cast<ip_event_got_ip_t*>(eventData);
@@ -130,7 +131,7 @@ void WiFiStation::handleIpEvent(int32_t eventId)
     }
 }
 
-void WiFiStation::scheduleReconnect()
+void WiFiManager::scheduleReconnect()
 {
     _retryTimer.expires_after(std::chrono::seconds(10));
     _retryTimer.async_wait(

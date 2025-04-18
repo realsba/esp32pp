@@ -21,7 +21,7 @@ ESP32++ (esp32pp) is a personal collection of C++ classes designed for use with 
 - **LedStrip**: Control for LED strips.
 - **RF433**: Interface for RF433 modules.
 - **Task**: Task management utilities.
-- **WiFiStation**: Easy Wi-Fi connection management.
+- **WiFiManager**: Easy Wi-Fi connection management.
 
 ## Installation
 
