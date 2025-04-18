@@ -14,7 +14,6 @@ WiFiManager::WiFiManager(asio::any_io_executor executor)
     , _workGuard(_executor)
     , _retryTimer(_executor)
 {
-    _netif = esp_netif_create_default_wifi_sta();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
@@ -31,35 +30,76 @@ WiFiManager::~WiFiManager()
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, _eventWiFi));
     esp_wifi_stop();
     esp_wifi_deinit();
-    esp_netif_destroy_default_wifi(_netif);
+    if (_netifSta) {
+        esp_netif_destroy_default_wifi(_netifSta);
+    }
+    if (_netifAp) {
+        esp_netif_destroy_default_wifi(_netifAp);
+    }
 }
 
-std::string WiFiManager::getSSID() const
+std::shared_ptr<WiFiManager> WiFiManager::create(asio::any_io_executor ex)
+{
+    return std::shared_ptr<WiFiManager>(new WiFiManager(std::move(ex)));
+}
+
+void WiFiManager::setStationConfig(const std::string& ssid, const std::string& password)
+{
+    wifi_config_t config = {};
+
+    ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &config));
+
+    auto n = ssid.copy(reinterpret_cast<char*>(config.sta.ssid), sizeof(config.sta.ssid) - 1);
+    config.sta.ssid[n] = 0;
+    n = password.copy(reinterpret_cast<char*>(config.sta.password), sizeof(config.sta.password) - 1);
+    config.sta.password[n] = 0;
+    config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+    config.sta.pmf_cfg.capable = true;
+    config.sta.pmf_cfg.required = false;
+
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &config));
+}
+
+void WiFiManager::setAccessPointConfig(const std::string& ssid, const std::string& password)
+{
+    wifi_config_t config = {};
+
+    ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_AP, &config));
+
+    auto n = ssid.copy(reinterpret_cast<char*>(config.ap.ssid), sizeof(config.ap.ssid) - 1);
+    config.ap.ssid[n] = 0;
+    n = password.copy(reinterpret_cast<char*>(config.ap.password), sizeof(config.ap.password) - 1);
+    config.ap.password[n] = 0;
+    config.ap.authmode = WIFI_AUTH_WPA2_PSK;
+    config.ap.ssid_len = 0;
+    config.ap.max_connection = 4;
+    config.ap.ssid_hidden = 0;
+
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &config));
+}
+
+std::string WiFiManager::getStationSSID()
 {
     wifi_config_t wifiConfig = {};
-
     ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &wifiConfig));
-
     auto* ssid = reinterpret_cast<char*>(wifiConfig.sta.ssid);
-
     return {ssid, strnlen(ssid, sizeof(wifiConfig.sta.ssid))};
 }
 
-void WiFiManager::setConfig(const std::string& ssid, const std::string& password)
+void WiFiManager::switchToStation()
 {
-    wifi_config_t wifiConfig = {};
+    stop();
+    ESP_LOGI(TAG, "Switching to STA mode");
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    start();
+}
 
-    ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &wifiConfig));
-
-    auto n = ssid.copy(reinterpret_cast<char*>(wifiConfig.sta.ssid), sizeof(wifiConfig.sta.ssid) - 1);
-    wifiConfig.sta.ssid[n] = 0;
-    n = password.copy(reinterpret_cast<char*>(wifiConfig.sta.password), sizeof(wifiConfig.sta.password) - 1);
-    wifiConfig.sta.password[n] = 0;
-    wifiConfig.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
-    wifiConfig.sta.pmf_cfg.capable = true;
-    wifiConfig.sta.pmf_cfg.required = false;
-
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifiConfig));
+void WiFiManager::switchToAccessPoint()
+{
+    stop();
+    ESP_LOGI(TAG, "Switching to AP mode");
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+    start();
 }
 
 void WiFiManager::setOnConnect(Handler&& handler)
@@ -79,15 +119,27 @@ void WiFiManager::setOnStop(Handler&& handler)
 
 void WiFiManager::start()
 {
-    ESP_LOGI(TAG, "Starting Wi-Fi station...");
+    wifi_mode_t currentMode;
+    auto err = esp_wifi_get_mode(&currentMode);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to get current Wi-Fi mode");
+        return;
+    }
 
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    if ((currentMode == WIFI_MODE_STA || currentMode == WIFI_MODE_APSTA) && !_netifSta) {
+        _netifSta = esp_netif_create_default_wifi_sta();
+    }
+    if ((currentMode == WIFI_MODE_AP || currentMode == WIFI_MODE_APSTA) && !_netifAp) {
+        _netifAp = esp_netif_create_default_wifi_ap();
+    }
+
+    ESP_LOGI(TAG, "Starting Wi-Fi...");
     ESP_ERROR_CHECK(esp_wifi_start());
 }
 
 void WiFiManager::stop()
 {
-    ESP_LOGI(TAG, "Stopping Wi-Fi station...");
+    ESP_LOGI(TAG, "Stopping Wi-Fi...");
     esp_wifi_stop();
 }
 

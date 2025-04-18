@@ -13,15 +13,22 @@
 namespace esp32pp {
 
 class WiFiManager : public std::enable_shared_from_this<WiFiManager> {
+    explicit WiFiManager(asio::any_io_executor executor);
+
 public:
     using Handler = std::function<void()>;
 
-    explicit WiFiManager(asio::any_io_executor executor);
     ~WiFiManager();
 
-    std::string getSSID() const;
+    static std::shared_ptr<WiFiManager> create(asio::any_io_executor ex);
 
-    void setConfig(const std::string& ssid, const std::string& password);
+    void setStationConfig(const std::string& ssid, const std::string& password);
+    void setAccessPointConfig(const std::string& ssid, const std::string& password);
+    static std::string getStationSSID();
+
+    void switchToStation();
+    void switchToAccessPoint();
+
     void setOnConnect(Handler&& handler);
     void setOnReconnecting(Handler&& handler);
     void setOnStop(Handler&& handler);
@@ -45,7 +52,8 @@ private:
     Handler _onConnect;
     Handler _onReconnecting;
     Handler _onStop;
-    esp_netif_t* _netif{nullptr};
+    esp_netif_t* _netifSta{nullptr};
+    esp_netif_t* _netifAp{nullptr};
     esp_event_handler_instance_t _eventWiFi{nullptr};
     esp_event_handler_instance_t _eventIp{nullptr};
 };
