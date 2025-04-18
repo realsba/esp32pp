@@ -1,5 +1,7 @@
-#ifndef ESP32PP_TELEGRAMBOT_HPP
-#define ESP32PP_TELEGRAMBOT_HPP
+// file   : TelegramBot.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <esp_http_client.h>
 
@@ -19,5 +21,3 @@ private:
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_TELEGRAMBOT_HPP

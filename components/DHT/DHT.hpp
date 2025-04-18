@@ -1,5 +1,7 @@
-#ifndef ESP32PP_DHT_HPP
-#define ESP32PP_DHT_HPP
+// file   : DHT.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include "Task.hpp"
 
@@ -33,26 +35,22 @@ private:
     virtual float humidity() = 0;
 
 protected:
-    // @formatter:off
-    std::error_code             _status;
-    uint16_t                    _startSignalDuration {1000};
-    uint8_t                     _data[5] {};
-    // @formatter:on
+    std::error_code _status;
+    uint16_t _startSignalDuration{1000};
+    uint8_t _data[5]{};
 
 private:
     static uint32_t s_nextId;
 
-    // @formatter:off
-    uint32_t                    _id = s_nextId;
-    rmt_symbol_word_t           _symbols[64] {};
-    Task                        _task {[this] { readSensor(); }, "DHT:" + std::to_string(_id)};
-    Handler                     _handler;
-    rmt_channel_handle_t        _channel {nullptr};
-    gpio_num_t                  _pin {GPIO_NUM_0};
-    // @formatter:on
+    uint32_t _id = s_nextId;
+    rmt_symbol_word_t _symbols[64]{};
+    Task _task{[this] { readSensor(); }, "DHT:" + std::to_string(_id)};
+    Handler _handler;
+    rmt_channel_handle_t _channel{nullptr};
+    gpio_num_t _pin{GPIO_NUM_0};
 };
 
-class DHT11 : public DHT {
+class DHT11 final : public DHT {
 public:
     explicit DHT11();
 
@@ -61,7 +59,7 @@ private:
     float humidity() override;
 };
 
-class DHT22 : public DHT {
+class DHT22 final : public DHT {
     float temperature() override;
     float humidity() override;
 };
@@ -80,8 +78,8 @@ public:
 
     static const std::error_category& getInstance();
 
-    const char* name() const noexcept override;
-    std::string message(int ev) const override;
+    [[nodiscard]] const char* name() const noexcept override;
+    [[nodiscard]] std::string message(int ev) const override;
 };
 
 } // namespace detail
@@ -96,7 +94,4 @@ inline std::error_code make_error_code(DhtCategory e)
 } // namespace esp32pp
 
 template <>
-struct std::is_error_code_enum<esp32pp::error::DhtCategory> : true_type {
-};
-
-#endif // ESP32PP_DHT_HPP
+struct std::is_error_code_enum<esp32pp::error::DhtCategory> : true_type {};

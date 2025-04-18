@@ -1,3 +1,6 @@
+// file   : DHT.cpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
 #include "DHT.hpp"
 
 #include <driver/gpio.h>
@@ -11,7 +14,7 @@ namespace esp32pp {
 
 constexpr auto TAG = "DHT";
 
-uint32_t DHT::s_nextId {0};
+uint32_t DHT::s_nextId{0};
 
 DHT::~DHT()
 {
@@ -60,7 +63,7 @@ void DHT::read(Handler&& handler)
     };
 
     _handler = std::move(handler);
-    _status  = std::error_code();
+    _status = std::error_code();
 
     gpio_set_direction(_pin, GPIO_MODE_OUTPUT);
     gpio_set_level(_pin, 0);
@@ -74,14 +77,14 @@ bool IRAM_ATTR DHT::rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_
     void* context)
 {
     BaseType_t highTaskWakeup = pdFALSE;
-    auto taskToNotify         = static_cast<TaskHandle_t>(context);
+    auto taskToNotify = static_cast<TaskHandle_t>(context);
     xTaskNotifyFromISR(taskToNotify, reinterpret_cast<uint32_t>(eventData), eSetValueWithOverwrite, &highTaskWakeup);
     return highTaskWakeup == pdTRUE;
 }
 
 void DHT::readSensor()
 {
-    rmt_rx_done_event_data_t* eventData {nullptr};
+    rmt_rx_done_event_data_t* eventData{nullptr};
 
     if (xTaskNotifyWait(0x00, ULONG_MAX, reinterpret_cast<uint32_t*>(&eventData), portMAX_DELAY) == pdTRUE) {
         ESP_LOGI(TAG, "Decode a response %p %d", eventData->received_symbols, eventData->num_symbols);
@@ -105,7 +108,7 @@ void DHT::decode(rmt_symbol_word_t* data, size_t numItems)
     _data[2] = 0;
     _data[3] = 0;
     _data[4] = 0;
-    _status  = error::DhtCategory::BadResponse;
+    _status = error::DhtCategory::BadResponse;
 
     if (numItems < 42) {
         ESP_LOGD(TAG, "Incorrect pulse count: %u", numItems);
@@ -178,7 +181,7 @@ float DHT22::temperature()
     if (_status) {
         return std::numeric_limits<float>::quiet_NaN();
     }
-    auto temp = static_cast<float>((((_data[2] & 0x7F) << 8) | _data[3]) * 0.1);
+    auto temp = static_cast<float>(((_data[2] & 0x7F) << 8 | _data[3]) * 0.1);
     if (_data[2] & 0x80) {
         temp = -temp;
     }
@@ -190,7 +193,7 @@ float DHT22::humidity()
     if (_status) {
         return std::numeric_limits<float>::quiet_NaN();
     }
-    return static_cast<float>(((_data[0] << 8) | _data[1]) * 0.1);
+    return static_cast<float>((_data[0] << 8 | _data[1]) * 0.1);
 }
 
 namespace error::detail {

@@ -1,3 +1,6 @@
+// file   : PwmController.cpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
 #include "PwmController.hpp"
 
 namespace esp32pp {
@@ -19,7 +22,7 @@ void PwmController::setDutyCycle(uint32_t value)
 
 void PwmController::init()
 {
-    const auto timerConfig = ledc_timer_config_t {
+    const auto timerConfig = ledc_timer_config_t{
         .speed_mode = LEDC_HIGH_SPEED_MODE,
         .duty_resolution = LEDC_TIMER_10_BIT,
         .timer_num = LEDC_TIMER_0,

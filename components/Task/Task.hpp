@@ -1,5 +1,7 @@
-#ifndef ESP32PP_TASK_HPP
-#define ESP32PP_TASK_HPP
+// file   : Task.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -15,10 +17,10 @@ public:
 
     explicit Task(
         Function func, std::string name = "Task", uint32_t stackSize = 4096,
-        UBaseType_t priority            = 5, BaseType_t coreId       = tskNO_AFFINITY
+        UBaseType_t priority = 5, BaseType_t coreId = tskNO_AFFINITY
     );
 
-    TaskHandle_t getNativeHandle() const;
+    [[nodiscard]] TaskHandle_t getNativeHandle() const;
     void terminate();
 
     void suspend();
@@ -29,14 +31,10 @@ private:
 
     void run();
 
-    // @formatter:off
-    Function                    _function;
-    const std::string           _name;
-    TaskHandle_t                _handle {nullptr};
-    volatile bool               _running {false};
-    // @formatter:on
+    Function _function;
+    const std::string _name;
+    TaskHandle_t _handle{nullptr};
+    volatile bool _running{false};
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_TASK_HPP

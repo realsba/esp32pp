@@ -1,5 +1,7 @@
-#ifndef ESP32PP_TM1637_HPP
-#define ESP32PP_TM1637_HPP
+// file   : TM1637.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <driver/gpio.h>
 
@@ -18,8 +20,8 @@ public:
 
 private:
     enum class Command : uint8_t {
-        AutoAddressing = 0x40,
-        SetBrightness = 0x88,
+        AutoAddressing  = 0x40,
+        SetBrightness   = 0x88,
         DisplaySegments = 0xC0
     };
 
@@ -32,5 +34,3 @@ private:
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_TM1637_HPP

@@ -1,5 +1,7 @@
-#ifndef ESP32PP_PWMCONTROLLER_HPP
-#define ESP32PP_PWMCONTROLLER_HPP
+// file   : PwmController.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <driver/ledc.h>
 
@@ -14,14 +16,10 @@ public:
 private:
     void init();
 
-    // @formatter:off
-    gpio_num_t                  _pin;
-    uint32_t                    _frequency;
-    uint8_t                     _dutyCycle;
-    ledc_channel_config_t       _ledcChannelConfig {};
-    // @formatter:on
+    gpio_num_t _pin;
+    uint32_t _frequency;
+    uint8_t _dutyCycle;
+    ledc_channel_config_t _ledcChannelConfig{};
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_PWMCONTROLLER_HPP

@@ -1,3 +1,6 @@
+// file   : WiFiStation.cpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
 #include "WiFiStation.hpp"
 
 #include <esp_log.h>
@@ -10,7 +13,7 @@ WiFiStation::WiFiStation(asio::io_context& ioContext)
     : _ioContext(ioContext)
     , _retryTimer(ioContext)
 {
-    _netif                 = esp_netif_create_default_wifi_sta();
+    _netif = esp_netif_create_default_wifi_sta();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
@@ -131,8 +134,7 @@ void WiFiStation::scheduleReconnect()
 {
     _retryTimer.expires_after(std::chrono::seconds(10));
     _retryTimer.async_wait(
-        [self = shared_from_this()](const asio::error_code& ec)
-        {
+        [self = shared_from_this()](const asio::error_code& ec) {
             if (!ec) {
                 esp_wifi_connect();
             }

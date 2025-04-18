@@ -1,5 +1,7 @@
-#ifndef ESP32PP_I2CBUS_HPP
-#define ESP32PP_I2CBUS_HPP
+// file   : I2CBus.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <driver/i2c_master.h>
 
@@ -16,15 +18,11 @@ private:
     void init();
     void deinit();
 
-    // @formatter:off
-    i2c_port_t                  _port;
-    gpio_num_t                  _sda;
-    gpio_num_t                  _scl;
-    uint32_t                    _freq;
-    i2c_master_bus_handle_t     _busHandle {nullptr};
-    // @formatter:on
+    i2c_port_t _port;
+    gpio_num_t _sda;
+    gpio_num_t _scl;
+    uint32_t _freq;
+    i2c_master_bus_handle_t _busHandle{nullptr};
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_I2CBUS_HPP

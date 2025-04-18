@@ -1,5 +1,7 @@
-#ifndef ESP32PP_HTTPSERVER_HPP
-#define ESP32PP_HTTPSERVER_HPP
+// file   : HttpServer.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <esp_http_server.h>
 
@@ -13,9 +15,7 @@ public:
     void addUriHandler(const httpd_uri_t& httpdUri);
 
 private:
-    httpd_handle_t _server {nullptr};
+    httpd_handle_t _server{nullptr};
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_HTTPSERVER_HPP

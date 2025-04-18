@@ -1,3 +1,6 @@
+// file   : I2CBus.cpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
 #include "I2CBus.hpp"
 
 #include "esp_err.h"

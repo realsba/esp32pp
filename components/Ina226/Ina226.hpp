@@ -1,5 +1,7 @@
-#ifndef ESP32PP_INA226_HPP
-#define ESP32PP_INA226_HPP
+// file   : Ina226.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <string>
 
@@ -39,16 +41,12 @@ public:
     float getCurrent();
 
 private:
-    // @formatter:off
-    I2CBus&                     _bus;
-    uint16_t                    _address;
-    i2c_master_dev_handle_t     _handle {nullptr};
-    double                      _shuntResistorValue {0.1};
-    double                      _currentLSB {0};
-    double                      _powerLSB {0};
-    // @formatter:on
+    I2CBus& _bus;
+    uint16_t _address;
+    i2c_master_dev_handle_t _handle{nullptr};
+    double _shuntResistorValue{0.1};
+    double _currentLSB{0};
+    double _powerLSB{0};
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_INA226_HPP

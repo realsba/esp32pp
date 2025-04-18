@@ -1,3 +1,6 @@
+// file   : Ina226.cpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
 #include "Ina226.hpp"
 #include "I2CBus.hpp"
 
@@ -31,8 +34,8 @@ Ina226::Ina226(I2CBus& bus, uint16_t address)
 
 void Ina226::calibrate(float shuntResistor, float maxCurrent)
 {
-    _currentLSB           = maxCurrent / 32768;
-    _powerLSB             = 25 * _currentLSB;
+    _currentLSB = maxCurrent / 32768;
+    _powerLSB = 25 * _currentLSB;
     auto calibrationValue = static_cast<uint16_t>(0.00512 / (_currentLSB * shuntResistor));
     writeRegister(Register::Calibration, calibrationValue);
 }

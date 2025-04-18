@@ -1,3 +1,6 @@
+// file   : TelegramBot.cpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
 #include "TelegramBot.hpp"
 
 #include <esp_log.h>
@@ -9,8 +12,8 @@ constexpr auto TAG = "TelegramBot";
 TelegramBot::TelegramBot(const std::string& token)
 {
     std::string url = "https://api.telegram.org/bot" + token + "/sendMessage";
-    esp_http_client_config_t config {};
-    config.url  = url.c_str();
+    esp_http_client_config_t config{};
+    config.url = url.c_str();
     _httpClient = esp_http_client_init(&config);
     if (_httpClient == nullptr) {
         ESP_LOGE(TAG, "Failed to create HTTP client");

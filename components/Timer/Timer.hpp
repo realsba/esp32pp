@@ -1,5 +1,7 @@
-#ifndef ESP32PP_TIMER_HPP
-#define ESP32PP_TIMER_HPP
+// file   : Timer.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <esp_timer.h>
 
@@ -24,13 +26,9 @@ public:
 private:
     static void timerCallback(void* arg);
 
-    // @formatter:off
-    esp_timer_handle_t          _timerHandle {};
-    Callback                    _callback;
-    bool                        _isRunning {false};
-    // @formatter:on
+    esp_timer_handle_t _timerHandle{};
+    Callback _callback;
+    bool _isRunning{false};
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_TIMER_HPP

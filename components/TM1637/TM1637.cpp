@@ -1,3 +1,6 @@
+// file   : TM1637.cpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
 #include "TM1637.hpp"
 
 #include <freertos/FreeRTOS.h>
@@ -8,8 +11,7 @@ constexpr auto TAG = "TM1637";
 
 TM1637::TM1637(gpio_num_t clk, gpio_num_t dio)
     : _clkPin(clk), _dioPin(dio)
-{
-}
+{}
 
 void TM1637::init()
 {

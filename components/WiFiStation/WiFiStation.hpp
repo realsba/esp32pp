@@ -1,5 +1,7 @@
-#ifndef ESP32PP_WIFI_STATION_HPP
-#define ESP32PP_WIFI_STATION_HPP
+// file   : WiFiStation.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <esp_wifi.h>
 #include <asio.hpp>
@@ -38,16 +40,14 @@ private:
     void scheduleReconnect();
 
     asio::io_context& _ioContext;
-    WorkGuard _workGuard {_ioContext.get_executor()};
+    WorkGuard _workGuard{_ioContext.get_executor()};
     asio::steady_timer _retryTimer;
     Handler _onConnect;
     Handler _onReconnecting;
     Handler _onStop;
-    esp_netif_t* _netif {nullptr};
-    esp_event_handler_instance_t _eventWiFi {nullptr};
-    esp_event_handler_instance_t _eventIp {nullptr};
+    esp_netif_t* _netif{nullptr};
+    esp_event_handler_instance_t _eventWiFi{nullptr};
+    esp_event_handler_instance_t _eventIp{nullptr};
 };
 
 } // namespace esp32pp
-
-#endif  // ESP32PP_WIFI_STATION_HPP

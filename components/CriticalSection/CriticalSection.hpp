@@ -1,5 +1,7 @@
-#ifndef ESP32PP_CRITICALSECTION_HPP
-#define ESP32PP_CRITICALSECTION_HPP
+// file   : CriticalSection.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/portmacro.h>
@@ -25,5 +27,3 @@ private:
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_CRITICALSECTION_HPP

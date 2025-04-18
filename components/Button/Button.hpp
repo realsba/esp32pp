@@ -1,5 +1,7 @@
-#ifndef ESP32PP_BUTTON_HPP
-#define ESP32PP_BUTTON_HPP
+// file   : Button.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include "Task.hpp"
 
@@ -25,17 +27,13 @@ private:
     void handleInterrupt();
     void debounce();
 
-    // @formatter:off
-    const gpio_num_t            _gpio;
-    const std::string           _name;
-    portMUX_TYPE                _mux = portMUX_INITIALIZER_UNLOCKED;
-    Task                        _task;
-    volatile uint32_t           _debounceTimeout {0};
-    Handler                     _onPressed;
-    Handler                     _onReleased;
-    // @formatter:on
+    const gpio_num_t _gpio;
+    const std::string _name;
+    portMUX_TYPE _mux = portMUX_INITIALIZER_UNLOCKED;
+    Task _task;
+    volatile uint32_t _debounceTimeout{0};
+    Handler _onPressed;
+    Handler _onReleased;
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_BUTTON_HPP

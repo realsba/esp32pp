@@ -1,3 +1,6 @@
+// file   : Timer.cpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
 #include "Timer.hpp"
 
 #include <esp_log.h>

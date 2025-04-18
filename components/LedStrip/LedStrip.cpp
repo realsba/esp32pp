@@ -1,3 +1,6 @@
+// file   : LedStrip.cpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
 #include "LedStrip.hpp"
 
 #include <driver/rmt_tx.h>
@@ -15,12 +18,11 @@ LedStripConfig::LedStripConfig(
     std::chrono::nanoseconds rst
 )
     : T0H(t0h), T1H(t1h), T0L(t0l), T1L(t1l), RST(rst)
-{
-}
+{}
 
 void LedStrip::setup(uint8_t gpio, const LedStripConfig& config)
 {
-    constexpr uint32_t clockResolution {10000000};
+    constexpr uint32_t clockResolution{10000000};
     using Duration = std::chrono::duration<int64_t, std::ratio<1, clockResolution>>;
 
     rmt_tx_channel_config_t channelConfig = {
@@ -41,25 +43,25 @@ void LedStrip::setup(uint8_t gpio, const LedStripConfig& config)
     ESP_ERROR_CHECK(rmt_new_tx_channel(&channelConfig, &_channel));
 
     rmt_bytes_encoder_config_t bytesEncoderConfig;
-    bytesEncoderConfig.bit0.duration0  = std::chrono::duration_cast<Duration>(config.T0H).count();
-    bytesEncoderConfig.bit0.level0     = 1;
-    bytesEncoderConfig.bit0.duration1  = std::chrono::duration_cast<Duration>(config.T0L).count();
-    bytesEncoderConfig.bit0.level1     = 0;
-    bytesEncoderConfig.bit1.duration0  = std::chrono::duration_cast<Duration>(config.T1H).count();
-    bytesEncoderConfig.bit1.level0     = 1;
-    bytesEncoderConfig.bit1.duration1  = std::chrono::duration_cast<Duration>(config.T1L).count();
-    bytesEncoderConfig.bit1.level1     = 0;
+    bytesEncoderConfig.bit0.duration0 = std::chrono::duration_cast<Duration>(config.T0H).count();
+    bytesEncoderConfig.bit0.level0 = 1;
+    bytesEncoderConfig.bit0.duration1 = std::chrono::duration_cast<Duration>(config.T0L).count();
+    bytesEncoderConfig.bit0.level1 = 0;
+    bytesEncoderConfig.bit1.duration0 = std::chrono::duration_cast<Duration>(config.T1H).count();
+    bytesEncoderConfig.bit1.level0 = 1;
+    bytesEncoderConfig.bit1.duration1 = std::chrono::duration_cast<Duration>(config.T1L).count();
+    bytesEncoderConfig.bit1.level1 = 0;
     bytesEncoderConfig.flags.msb_first = true;
     ESP_ERROR_CHECK(rmt_new_bytes_encoder(&bytesEncoderConfig, &_bytesEncoder));
 
     rmt_copy_encoder_config_t copyEncoderConfig = {};
     ESP_ERROR_CHECK(rmt_new_copy_encoder(&copyEncoderConfig, &_copyEncoder));
 
-    auto ticks           = std::chrono::duration_cast<Duration>(config.RST).count() / 2;
+    auto ticks = std::chrono::duration_cast<Duration>(config.RST).count() / 2;
     _resetCode.duration0 = ticks;
-    _resetCode.level0    = 0;
+    _resetCode.level0 = 0;
     _resetCode.duration1 = ticks;
-    _resetCode.level1    = 0;
+    _resetCode.level1 = 0;
 
     rmt_enable(_channel);
 }
@@ -100,8 +102,8 @@ size_t IRAM_ATTR LedStrip::encode(
     rmt_channel_handle_t channel, const void* data, size_t dataSize, rmt_encode_state_t* retState
 )
 {
-    rmt_encode_state_t sessionState {};
-    int state             = 0;
+    rmt_encode_state_t sessionState{};
+    int state = 0;
     size_t encodedSymbols = 0;
 
     switch (_state) {

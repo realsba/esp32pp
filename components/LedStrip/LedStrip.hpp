@@ -1,5 +1,7 @@
-#ifndef ESP32PP_LEDSTRIP_HPP
-#define ESP32PP_LEDSTRIP_HPP
+// file   : LedStrip.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <chrono>
 
@@ -27,20 +29,17 @@ using namespace std::chrono_literals;
 
 struct WS2812Config : LedStripConfig {
     WS2812Config() : LedStripConfig(350ns, 700ns, 800ns, 600ns, 50us)
-    {
-    }
+    {}
 };
 
 struct WS2812BConfig : LedStripConfig {
     WS2812BConfig() : LedStripConfig(400ns, 800ns, 850ns, 450ns, 50us)
-    {
-    }
+    {}
 };
 
 struct SK6812Config : LedStripConfig {
     SK6812Config() : LedStripConfig(300ns, 600ns, 900ns, 600ns, 80us)
-    {
-    }
+    {}
 };
 
 class LedStrip {
@@ -67,16 +66,12 @@ private:
     size_t encode(rmt_channel_handle_t channel, const void* data, size_t dataSize, rmt_encode_state_t* retState);
     esp_err_t reset();
 
-    // @formatter:off
-    rmt_encoder_t               _encoder {.encode = encode_led_strip, .reset = reset_led_strip, .del = nullptr};
-    rmt_channel_handle_t        _channel {nullptr};
-    rmt_encoder_handle_t        _bytesEncoder {nullptr};
-    rmt_encoder_handle_t        _copyEncoder {nullptr};
-    rmt_symbol_word_t           _resetCode {};
-    State                       _state {State::SendRgbData};
-    // @formatter:on
+    rmt_encoder_t _encoder{.encode = encode_led_strip, .reset = reset_led_strip, .del = nullptr};
+    rmt_channel_handle_t _channel{nullptr};
+    rmt_encoder_handle_t _bytesEncoder{nullptr};
+    rmt_encoder_handle_t _copyEncoder{nullptr};
+    rmt_symbol_word_t _resetCode{};
+    State _state{State::SendRgbData};
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_LEDSTRIP_HPP

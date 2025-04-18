@@ -11,13 +11,13 @@ using namespace std;
 Button::Button(gpio_num_t gpio, std::string name)
     : _gpio(gpio)
     , _name(std::move(name))
-    , _task(std::bind_front(&Button::debounce, this), _name)
+    , _task([this] { debounce(); })
 {
-    gpio_config_t io_conf {};
-    io_conf.intr_type    = GPIO_INTR_ANYEDGE;
+    gpio_config_t io_conf{};
+    io_conf.intr_type = GPIO_INTR_ANYEDGE;
     io_conf.pin_bit_mask = (1ULL << _gpio);
-    io_conf.mode         = GPIO_MODE_INPUT;
-    io_conf.pull_up_en   = GPIO_PULLUP_ENABLE;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     gpio_config(&io_conf);
 

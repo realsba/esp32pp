@@ -1,5 +1,7 @@
-#ifndef ESP32PP_RF433_HPP
-#define ESP32PP_RF433_HPP
+// file   : RF433.hpp
+// author : sba <bohdan.sadovyak@gmail.com>
+
+#pragma once
 
 #include <chrono>
 
@@ -31,16 +33,12 @@ private:
     size_t encode(rmt_channel_handle_t channel, const void* data, size_t dataSize, rmt_encode_state_t* retState);
     esp_err_t reset();
 
-    // @formatter:off
-    rmt_encoder_t               _encoder {.encode = encode, .reset = reset, .del = nullptr};
-    rmt_channel_handle_t        _channel {nullptr};
-    rmt_encoder_handle_t        _bytesEncoder {nullptr};
-    rmt_encoder_handle_t        _copyEncoder {nullptr};
-    rmt_symbol_word_t           _resetCode {};
-    State                       _state {State::SendData};
-    // @formatter:on
+    rmt_encoder_t _encoder{.encode = encode, .reset = reset, .del = nullptr};
+    rmt_channel_handle_t _channel{nullptr};
+    rmt_encoder_handle_t _bytesEncoder{nullptr};
+    rmt_encoder_handle_t _copyEncoder{nullptr};
+    rmt_symbol_word_t _resetCode{};
+    State _state{State::SendData};
 };
 
 } // namespace esp32pp
-
-#endif // ESP32PP_RF433_HPP
