@@ -1,5 +1,7 @@
-## IDF Component Manager Manifest File
 dependencies:
-  espressif/asio: "^1.28.2"
-  idf:
-    version: ">=5.4.0"
+  LedEffects:
+    version: ^1.0.0
+    override_path: "../../../components/LedEffects"
+  LedStrip:
+    version: ^1.0.0
+    override_path: "../../../components/LedStrip"

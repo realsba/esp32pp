@@ -24,8 +24,8 @@ TEST_CASE("Basic sequence execution", "[ActionSequence]")
     std::promise<void> promiseComplete;
     auto fut = promiseComplete.get_future();
 
-    seq.addAction([&] { log.push_back(1); }, 10ms);
-    seq.addAction([&] { log.push_back(2); }, 10ms);
+    seq.addAction([&] { log.push_back(1); }, 1ms);
+    seq.addAction([&] { log.push_back(2); }, 1ms);
     seq.setNoRepeat();
     seq.setOnComplete(
         [&] {
@@ -57,7 +57,7 @@ TEST_CASE("Repeat count execution", "[ActionSequence]")
     std::promise<void> promiseComplete;
     auto fut = promiseComplete.get_future();
 
-    seq.addAction([&] { counter++; }, 5ms);
+    seq.addAction([&] { counter++; }, 1ms);
     seq.setRepeatCount(3);
     seq.setOnComplete([&] {
         counter += 100;
@@ -84,7 +84,7 @@ TEST_CASE("Restart in onComplete", "[ActionSequence]")
     std::promise<void> promiseComplete;
     auto fut = promiseComplete.get_future();
 
-    seq.addAction([&] { phases++; }, 10ms);
+    seq.addAction([&] { phases++; }, 1ms);
     seq.setOnComplete([&] {
         if (phases == 1) {
             seq.start();

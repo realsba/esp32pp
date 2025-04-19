@@ -1,9 +1,18 @@
+# IDE
 .idea/
 
+# IDF build artifacts
 build/
 cmake-build-*/
-
-managed_components/
-dependencies.lock
 sdkconfig
 sdkconfig.old
+
+# Component manager cache
+managed_components/
+dependencies.lock
+
+# Coverage reports
+coverage-report/
+*.gcno
+*.gcda
+*.info

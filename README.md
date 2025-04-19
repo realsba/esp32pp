@@ -21,7 +21,7 @@ ESP32++ (esp32pp) is a personal collection of C++ classes designed for use with 
 - **LedStrip**: Control for LED strips.
 - **RF433**: Interface for RF433 modules.
 - **Task**: Task management utilities.
-- **WiFiStation**: Easy Wi-Fi connection management.
+- **WiFiManager**: Easy Wi-Fi connection management.
 
 ## Installation
 
@@ -29,19 +29,6 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/realsba/esp32pp.git
-cd esp32pp
-```
-
-Ensure you have ESP-IDF installed and properly configured:
-
-```bash
-. $HOME/esp/esp-idf/export.sh
-```
-
-Then, build the project using CMake:
-
-```bash
-idf.py build
 ```
 
 ## Usage
@@ -80,25 +67,6 @@ myButton.setPressedHandler([](){
 ```bash
 idf.py build
 idf.py flash
-```
-
-## Project Structure
-```
-esp32pp/
-├── Button/             # Button handling classes
-├── CriticalSection/    # Critical section management
-├── DHT/                # DHT sensor interface
-├── HttpServer/         # HTTP server implementation
-├── I2C/                # I2C communication
-├── Ina226/             # INA226 power monitor driver
-├── LedStrip/           # LED strip control
-├── RF433/              # RF433 module interface
-├── Task/               # Task management utilities
-├── WiFiStation/        # Wi-Fi connection management
-├── examples/           # Example projects
-├── main/               # Main application code
-├── CMakeLists.txt      # CMake build configuration
-└── sdkconfig           # ESP-IDF SDK configuration
 ```
 
 ## Dependencies

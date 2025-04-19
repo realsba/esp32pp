@@ -8,6 +8,10 @@ enable_testing()
 
 find_package(Catch2 3 REQUIRED)
 
+include(CTest)
+include(Catch)
+enable_testing()
+
 include_directories(
     ${Catch2_INCLUDE_DIRS}
     ../managed_components/espressif__asio/asio/asio/include
@@ -15,14 +19,13 @@ include_directories(
 
 file(GLOB TEST_SOURCES CONFIGURE_DEPENDS "*.cpp")
 
-add_executable(tests
+add_executable(${PROJECT_NAME}
     ${TEST_SOURCES}
     ../LedEffects/ActionSequence.cpp
 )
 
-target_link_libraries(tests PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     Catch2::Catch2WithMain
 )
 
-include(Catch)
-catch_discover_tests(tests)
+catch_discover_tests(${PROJECT_NAME})

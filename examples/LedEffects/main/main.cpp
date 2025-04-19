@@ -24,8 +24,8 @@ extern "C" void app_main()
     asio::io_context ioc;
     esp32pp::LedController led(2, LEDC_CHANNEL_0);
 
-    esp32pp::ActionSequence fastBlink(ioc);
-    esp32pp::ActionSequence actions(ioc);
+    esp32pp::ActionSequence fastBlink(ioc.get_executor());
+    esp32pp::ActionSequence actions(ioc.get_executor());
 
     fastBlink.addAction([&led] { led.turnOn(); }, 50ms);
     fastBlink.addAction([&led] { led.turnOff(); }, 50ms);
