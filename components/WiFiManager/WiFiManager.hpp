@@ -24,14 +24,14 @@ public:
 
     void setStationConfig(const std::string& ssid, const std::string& password);
     void setAccessPointConfig(const std::string& ssid, const std::string& password);
-    static std::string getStationSSID();
+    std::string getStationSSID() const;
 
     void switchToStation();
     void switchToAccessPoint();
 
-    void setOnConnect(Handler&& handler);
-    void setOnReconnecting(Handler&& handler);
-    void setOnStop(Handler&& handler);
+    void setConnectHandler(Handler handler);
+    void setReconnectingHandler(Handler handler);
+    void setStopHandler(Handler handler);
 
     void start();
     void stop();
@@ -49,9 +49,9 @@ private:
     asio::any_io_executor _executor;
     WorkGuard _workGuard;
     asio::steady_timer _retryTimer;
-    Handler _onConnect;
-    Handler _onReconnecting;
-    Handler _onStop;
+    Handler _connectHandler;
+    Handler _reconnectingHandler;
+    Handler _stopHandler;
     esp_netif_t* _netifSta{nullptr};
     esp_netif_t* _netifAp{nullptr};
     esp_event_handler_instance_t _eventWiFi{nullptr};

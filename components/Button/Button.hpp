@@ -18,8 +18,8 @@ public:
     explicit Button(gpio_num_t gpio, std::string name);
     ~Button();
 
-    void setPressedHandler(Handler&& handler);
-    void setReleasedHandler(Handler&& handler);
+    void setPressedHandler(Handler handler);
+    void setReleasedHandler(Handler handler);
 
 private:
     static void gpio_interrupt_handler(void* arg);
@@ -32,8 +32,8 @@ private:
     portMUX_TYPE _mux = portMUX_INITIALIZER_UNLOCKED;
     Task _task;
     volatile uint32_t _debounceTimeout{0};
-    Handler _onPressed;
-    Handler _onReleased;
+    Handler _pressedHandler;
+    Handler _releasedHandler;
 };
 
 } // namespace esp32pp

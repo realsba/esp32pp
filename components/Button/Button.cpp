@@ -33,14 +33,14 @@ Button::~Button()
     _task.terminate();
 }
 
-void Button::setPressedHandler(Button::Handler&& handler)
+void Button::setPressedHandler(Handler handler)
 {
-    _onPressed = std::move(handler);
+    _pressedHandler = std::move(handler);
 }
 
-void Button::setReleasedHandler(Button::Handler&& handler)
+void Button::setReleasedHandler(Handler handler)
 {
-    _onReleased = std::move(handler);
+    _releasedHandler = std::move(handler);
 }
 
 void IRAM_ATTR Button::gpio_interrupt_handler(void* arg)
@@ -67,12 +67,12 @@ void Button::debounce()
 
         if (xTaskGetTickCount() >= debounceTimeout) {
             if (gpio_get_level(_gpio)) {
-                if (_onReleased) {
-                    _onReleased();
+                if (_releasedHandler) {
+                    _releasedHandler();
                 }
             } else {
-                if (_onPressed) {
-                    _onPressed();
+                if (_pressedHandler) {
+                    _pressedHandler();
                 }
             }
             break;

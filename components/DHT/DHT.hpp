@@ -22,7 +22,7 @@ public:
     virtual ~DHT();
 
     void setup(gpio_num_t gpio, uint32_t clockResolution);
-    void read(Handler&& handler);
+    void read(Handler handler);
 
 private:
     static bool rx_done_callback(rmt_channel_handle_t channel, const rmt_rx_done_event_data_t* eventData,
@@ -45,7 +45,7 @@ private:
     uint32_t _id = s_nextId;
     rmt_symbol_word_t _symbols[64]{};
     Task _task{[this] { readSensor(); }, "DHT:" + std::to_string(_id)};
-    Handler _handler;
+    Handler _readHandler;
     rmt_channel_handle_t _channel{nullptr};
     gpio_num_t _pin{GPIO_NUM_0};
 };

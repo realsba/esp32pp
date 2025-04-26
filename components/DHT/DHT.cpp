@@ -54,7 +54,7 @@ void DHT::setup(gpio_num_t gpio, uint32_t clockResolution)
     gpio_set_level(_pin, 1);
 }
 
-void DHT::read(Handler&& handler)
+void DHT::read(Handler handler)
 {
     static constexpr rmt_receive_config_t config = {
         .signal_range_min_ns = 5000,
@@ -62,7 +62,7 @@ void DHT::read(Handler&& handler)
         .flags = {.en_partial_rx = 0}
     };
 
-    _handler = std::move(handler);
+    _readHandler = std::move(handler);
     _status = std::error_code();
 
     gpio_set_direction(_pin, GPIO_MODE_OUTPUT);
@@ -95,8 +95,8 @@ void DHT::readSensor()
         gpio_set_direction(_pin, GPIO_MODE_OUTPUT);
         gpio_set_level(_pin, 1);
 
-        if (_handler) {
-            _handler(_status, humidity(), temperature());
+        if (_readHandler) {
+            _readHandler(_status, humidity(), temperature());
         }
     }
 }

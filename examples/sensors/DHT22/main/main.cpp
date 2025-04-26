@@ -23,15 +23,14 @@ extern "C" void app_main()
     auto sensor = std::make_unique<esp32pp::DHT22>();
     sensor->setup(static_cast<gpio_num_t>(CONFIG_RMT_GPIO_NUM), 1000000);
 
-    auto onReadSensor = [&](std::error_code ec, float humidity, float temperature)
-    {
+    auto onReadSensor = [&](std::error_code ec, float humidity, float temperature) {
         ESP_LOGI(TAG, "onReadSensor. humidity: %f, temperature: %f", humidity, temperature);
     };
 
     vTaskDelay(pdMS_TO_TICKS(1000));
 
     while (true) {
-        sensor->read(onReadSensor);
+        sensor->read(std::move(onReadSensor));
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }

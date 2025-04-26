@@ -78,7 +78,7 @@ void WiFiManager::setAccessPointConfig(const std::string& ssid, const std::strin
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &config));
 }
 
-std::string WiFiManager::getStationSSID()
+std::string WiFiManager::getStationSSID() const
 {
     wifi_config_t wifiConfig = {};
     ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &wifiConfig));
@@ -102,19 +102,19 @@ void WiFiManager::switchToAccessPoint()
     start();
 }
 
-void WiFiManager::setOnConnect(Handler&& handler)
+void WiFiManager::setConnectHandler(Handler handler)
 {
-    _onConnect = std::move(handler);
+    _connectHandler = std::move(handler);
 }
 
-void WiFiManager::setOnReconnecting(Handler&& handler)
+void WiFiManager::setReconnectingHandler(Handler handler)
 {
-    _onReconnecting = std::move(handler);
+    _reconnectingHandler = std::move(handler);
 }
 
-void WiFiManager::setOnStop(Handler&& handler)
+void WiFiManager::setStopHandler(Handler handler)
 {
-    _onStop = std::move(handler);
+    _stopHandler = std::move(handler);
 }
 
 void WiFiManager::start()
@@ -160,13 +160,13 @@ void WiFiManager::handleWiFiEvent(int32_t eventId)
     if (eventId == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
     } else if (eventId == WIFI_EVENT_STA_STOP) {
-        if (_onStop) {
-            _onStop();
+        if (_stopHandler) {
+            _stopHandler();
         }
     } else if (eventId == WIFI_EVENT_STA_DISCONNECTED) {
         ESP_LOGW(TAG, "Wi-Fi Disconnected. Scheduling reconnect...");
-        if (_onReconnecting) {
-            _onReconnecting();
+        if (_reconnectingHandler) {
+            _reconnectingHandler();
         }
         scheduleReconnect();
     }
@@ -177,8 +177,8 @@ void WiFiManager::handleIpEvent(int32_t eventId)
     if (eventId == IP_EVENT_STA_GOT_IP) {
         // auto* event = static_cast<ip_event_got_ip_t*>(eventData);
         // ESP_LOGI(TAG, "Wi-Fi connected, got IP: " IPSTR, IP2STR(&event->ip_info.ip));
-        if (_onConnect) {
-            _onConnect();
+        if (_connectHandler) {
+            _connectHandler();
         }
     }
 }
