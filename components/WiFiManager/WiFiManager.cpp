@@ -86,19 +86,46 @@ std::string WiFiManager::getStationSSID() const
     return {ssid, strnlen(ssid, sizeof(wifiConfig.sta.ssid))};
 }
 
-void WiFiManager::switchToStation()
+WiFiManager::WifiMode WiFiManager::getWifiMode() const
 {
-    stop();
-    ESP_LOGI(TAG, "Switching to STA mode");
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    start();
+    wifi_mode_t nativeMode;
+    auto err = esp_wifi_get_mode(&nativeMode);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to get Wi-Fi mode: %s (%d)", esp_err_to_name(err), err);
+        return WifiMode::Unknown;
+    }
+
+    switch (nativeMode) {
+        case WIFI_MODE_STA: return WifiMode::Station;
+        case WIFI_MODE_AP: return WifiMode::AccessPoint;
+        case WIFI_MODE_APSTA: return WifiMode::ApSta;
+        default:
+            return WifiMode::Unknown;
+    }
 }
 
-void WiFiManager::switchToAccessPoint()
+void WiFiManager::setWifiMode(WifiMode mode)
 {
+    ESP_LOGI(TAG, "Switching Wi-Fi mode to %s", toString(mode));
+
+    auto nativeMode = WIFI_MODE_NULL;
+    switch (mode) {
+        case WifiMode::Station:
+            nativeMode = WIFI_MODE_STA;
+            break;
+        case WifiMode::AccessPoint:
+            nativeMode = WIFI_MODE_AP;
+            break;
+        case WifiMode::ApSta:
+            nativeMode = WIFI_MODE_APSTA;
+            break;
+        default:
+            ESP_LOGE(TAG, "Unsupported WifiMode");
+            return;
+    }
+
     stop();
-    ESP_LOGI(TAG, "Switching to AP mode");
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+    ESP_ERROR_CHECK(esp_wifi_set_mode(nativeMode));
     start();
 }
 
@@ -175,8 +202,6 @@ void WiFiManager::handleWiFiEvent(int32_t eventId)
 void WiFiManager::handleIpEvent(int32_t eventId)
 {
     if (eventId == IP_EVENT_STA_GOT_IP) {
-        // auto* event = static_cast<ip_event_got_ip_t*>(eventData);
-        // ESP_LOGI(TAG, "Wi-Fi connected, got IP: " IPSTR, IP2STR(&event->ip_info.ip));
         if (_connectHandler) {
             _connectHandler();
         }

@@ -18,6 +18,13 @@ class WiFiManager : public std::enable_shared_from_this<WiFiManager> {
 public:
     using Handler = std::function<void()>;
 
+    enum class WifiMode : uint8_t {
+        Station = 0,
+        AccessPoint = 1,
+        ApSta = 2,
+        Unknown = 255
+    };
+
     ~WiFiManager();
 
     static std::shared_ptr<WiFiManager> create(asio::any_io_executor ex);
@@ -26,8 +33,8 @@ public:
     void setAccessPointConfig(const std::string& ssid, const std::string& password);
     std::string getStationSSID() const;
 
-    void switchToStation();
-    void switchToAccessPoint();
+    WifiMode getWifiMode() const;
+    void setWifiMode(WifiMode mode);
 
     void setConnectHandler(Handler handler);
     void setReconnectingHandler(Handler handler);
@@ -57,5 +64,14 @@ private:
     esp_event_handler_instance_t _eventWiFi{nullptr};
     esp_event_handler_instance_t _eventIp{nullptr};
 };
+
+inline const char* toString(WiFiManager::WifiMode mode) {
+    switch (mode) {
+        case WiFiManager::WifiMode::Station:     return "Station";
+        case WiFiManager::WifiMode::AccessPoint: return "AccessPoint";
+        case WiFiManager::WifiMode::ApSta:       return "Station+AP";
+        default:                                 return "Unknown";
+    }
+}
 
 } // namespace esp32pp
