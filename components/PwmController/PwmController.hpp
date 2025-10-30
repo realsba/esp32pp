@@ -4,6 +4,7 @@
 #pragma once
 
 #include <driver/ledc.h>
+#include <soc/gpio_num.h>
 
 namespace esp32pp {
 

@@ -1,6 +1,6 @@
 idf_component_register(
     SRCS "Button.cpp"
     INCLUDE_DIRS .
-    REQUIRES driver Task
+    REQUIRES esp_driver_gpio Task
     PRIV_REQUIRES CriticalSection
 )

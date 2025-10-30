@@ -27,9 +27,8 @@ void RF433::setup(uint8_t gpio)
         .flags = {
             .invert_out = false,
             .with_dma = false,
-            .io_loop_back = false,
-            .io_od_mode = false,
-            .allow_pd = true
+            .allow_pd = true,
+            .init_level = 0,
         }
     };
     ESP_ERROR_CHECK(rmt_new_tx_channel(&channelConfig, &_channel));

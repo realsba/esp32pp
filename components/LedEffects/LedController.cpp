@@ -20,7 +20,7 @@ LedController::LedController(int gpioNum, ledc_channel_t channel)
         .timer_num = LEDC_TIMER_0,
         .freq_hz = 5000,
         .clk_cfg = LEDC_AUTO_CLK,
-        .deconfigure = false
+        .deconfigure = false,
     };
     ESP_ERROR_CHECK(ledc_timer_config(&ledcTimerConfig));
 
@@ -33,7 +33,8 @@ LedController::LedController(int gpioNum, ledc_channel_t channel)
         .duty = 0,
         .hpoint = 0,
         .sleep_mode = LEDC_SLEEP_MODE_NO_ALIVE_NO_PD,
-        .flags = {.output_invert = false}
+        .flags = {.output_invert = false},
+        .deconfigure = false,
     };
     ESP_ERROR_CHECK(ledc_channel_config(&ledcChannelConfig));
 

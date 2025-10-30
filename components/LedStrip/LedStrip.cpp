@@ -35,9 +35,8 @@ void LedStrip::setup(uint8_t gpio, const LedStripConfig& config)
         .flags = {
             .invert_out = false,
             .with_dma = false,
-            .io_loop_back = false,
-            .io_od_mode = false,
-            .allow_pd = false
+            .allow_pd = false,
+            .init_level = 0,
         }
     };
     ESP_ERROR_CHECK(rmt_new_tx_channel(&channelConfig, &_channel));

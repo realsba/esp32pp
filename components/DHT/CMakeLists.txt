@@ -1,5 +1,5 @@
 idf_component_register(
     SRCS "DHT.cpp"
     INCLUDE_DIRS .
-    REQUIRES driver Task
+    REQUIRES esp_driver_rmt esp_driver_gpio Task
 )

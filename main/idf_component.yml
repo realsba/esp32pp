@@ -1,6 +1,6 @@
 ## IDF Component Manager Manifest File
 dependencies:
-  idf: ^5.4.0
+  idf: ^6.0.0
   espressif/asio: 1.32.0
   Button:
     override_path: ../components/Button
