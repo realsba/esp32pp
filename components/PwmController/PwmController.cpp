@@ -41,7 +41,8 @@ void PwmController::init()
         .duty = _dutyCycle,
         .hpoint = 0,
         .sleep_mode = LEDC_SLEEP_MODE_NO_ALIVE_NO_PD,
-        .flags = {.output_invert = false}
+        .flags = {.output_invert = false},
+        .deconfigure = false
     };
     ledc_channel_config(&_ledcChannelConfig);
     ledc_set_duty(LEDC_HIGH_SPEED_MODE, _ledcChannelConfig.channel, _dutyCycle);

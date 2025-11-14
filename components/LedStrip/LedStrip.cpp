@@ -20,6 +20,11 @@ LedStripConfig::LedStripConfig(
     : T0H(t0h), T1H(t1h), T0L(t0l), T1L(t1l), RST(rst)
 {}
 
+LedStrip::~LedStrip()
+{
+    cleanup();
+}
+
 void LedStrip::setup(uint8_t gpio, const LedStripConfig& config)
 {
     constexpr uint32_t clockResolution{10000000};
@@ -40,6 +45,12 @@ void LedStrip::setup(uint8_t gpio, const LedStripConfig& config)
         }
     };
     ESP_ERROR_CHECK(rmt_new_tx_channel(&channelConfig, &_channel));
+
+    _encoder = static_cast<rmt_encoder_handle_t>(rmt_alloc_encoder_mem(sizeof(LedStripEncoder)));
+    _encoder->encode = encode_led_strip;
+    _encoder->reset = reset_led_strip;
+    _encoder->del = nullptr;
+    reinterpret_cast<LedStripEncoder*>(_encoder)->context = this;
 
     rmt_bytes_encoder_config_t bytesEncoderConfig;
     bytesEncoderConfig.bit0.duration0 = std::chrono::duration_cast<Duration>(config.T0H).count();
@@ -65,13 +76,6 @@ void LedStrip::setup(uint8_t gpio, const LedStripConfig& config)
     rmt_enable(_channel);
 }
 
-LedStrip::~LedStrip()
-{
-    rmt_del_channel(_channel);
-    rmt_del_encoder(_bytesEncoder);
-    rmt_del_encoder(_copyEncoder);
-}
-
 bool LedStrip::transmit(const void* data, size_t dataSize)
 {
     rmt_transmit_config_t config = {
@@ -81,7 +85,7 @@ bool LedStrip::transmit(const void* data, size_t dataSize)
             .queue_nonblocking = 0
         }
     };
-    return rmt_transmit(_channel, &_encoder, data, dataSize, &config) == ESP_OK;
+    return rmt_transmit(_channel, _encoder, data, dataSize, &config) == ESP_OK;
 }
 
 size_t IRAM_ATTR LedStrip::encode_led_strip(
@@ -89,12 +93,12 @@ size_t IRAM_ATTR LedStrip::encode_led_strip(
     rmt_encode_state_t* retState
 )
 {
-    return reinterpret_cast<LedStrip*>(encoder)->encode(channel, data, dataSize, retState);
+    return get_led_strip(encoder)->encode(channel, data, dataSize, retState);
 }
 
 esp_err_t IRAM_ATTR LedStrip::reset_led_strip(rmt_encoder_t* encoder)
 {
-    return reinterpret_cast<LedStrip*>(encoder)->reset();
+    return get_led_strip(encoder)->reset();
 }
 
 size_t IRAM_ATTR LedStrip::encode(
@@ -115,7 +119,7 @@ size_t IRAM_ATTR LedStrip::encode(
                 state |= RMT_ENCODING_MEM_FULL;
                 break;
             }
-        // fall-through
+            [[fallthrough]];
         case State::SendResetCode:
             encodedSymbols += _copyEncoder->encode(_copyEncoder, channel, &_resetCode, sizeof(_resetCode),
                 &sessionState);
@@ -138,6 +142,24 @@ esp_err_t IRAM_ATTR LedStrip::reset()
     rmt_encoder_reset(_copyEncoder);
     _state = State::SendRgbData;
     return ESP_OK;
+}
+
+void LedStrip::cleanup()
+{
+    if (_channel) {
+        rmt_del_channel(_channel);
+        _channel = nullptr;
+    }
+    free(_encoder);
+    _encoder = nullptr;
+    if (_bytesEncoder) {
+        rmt_del_encoder(_bytesEncoder);
+        _bytesEncoder = nullptr;
+    }
+    if (_copyEncoder) {
+        rmt_del_encoder(_copyEncoder);
+        _copyEncoder = nullptr;
+    }
 }
 
 } // namespace esp32pp

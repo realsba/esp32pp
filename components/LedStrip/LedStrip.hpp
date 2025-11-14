@@ -42,6 +42,11 @@ struct SK6812Config : LedStripConfig {
     {}
 };
 
+struct LedStripEncoder {
+    rmt_encoder_t base;
+    void* context;
+};
+
 class LedStrip {
 public:
     ~LedStrip();
@@ -65,13 +70,18 @@ private:
 
     size_t encode(rmt_channel_handle_t channel, const void* data, size_t dataSize, rmt_encode_state_t* retState);
     esp_err_t reset();
+    void cleanup();
 
-    rmt_encoder_t _encoder{.encode = encode_led_strip, .reset = reset_led_strip, .del = nullptr};
     rmt_channel_handle_t _channel{nullptr};
+    rmt_encoder_handle_t _encoder{nullptr};
     rmt_encoder_handle_t _bytesEncoder{nullptr};
     rmt_encoder_handle_t _copyEncoder{nullptr};
     rmt_symbol_word_t _resetCode{};
     State _state{State::SendRgbData};
 };
+
+inline LedStrip* get_led_strip(rmt_encoder_t* encoder) {
+    return static_cast<LedStrip*>(reinterpret_cast<LedStripEncoder*>(encoder)->context);
+}
 
 } // namespace esp32pp
