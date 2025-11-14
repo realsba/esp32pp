@@ -11,6 +11,11 @@
 
 namespace esp32pp {
 
+// NOTE:
+// This Button class is synchronous and blocks a task during debounce.
+// Current projects use fully asynchronous architecture with espressif/asio.
+// If button functionality is needed in the future, rewrite using async handlers.
+
 class Button {
 public:
     using Handler = std::function<void()>;
